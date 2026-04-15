@@ -82,11 +82,17 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [dragging, setDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
-  const [showHelper, setShowHelper] = useState(true);
+  const [showHelper, setShowHelper] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchRef = useRef({ startX: 0, startY: 0, startTime: 0 });
   const [pinchScale, setPinchScale] = useState(1);
   const pinchRef = useRef({ initialDist: 0, baseScale: 1 });
+
+  useEffect(() => {
+    if (!localStorage.getItem('orientationHelperDismissed')) {
+      setShowHelper(true);
+    }
+  }, []);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -323,7 +329,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         padding: '40px',
         textAlign: 'center',
         animation: 'fadeInSimple 0.4s ease',
-      }} onClick={() => setShowHelper(false)}>
+      }} onClick={() => { localStorage.setItem('orientationHelperDismissed', '1'); setShowHelper(false); }}>
         <style>{baseStyles}</style>
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b6159" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '24px' }}>
           <rect x="5" y="2" width="14" height="20" rx="2" />
