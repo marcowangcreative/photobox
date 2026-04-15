@@ -42,6 +42,23 @@ function StackIcon({ color = '#6b6159' }: { color?: string }) {
   );
 }
 
+function SendIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b6159" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5a8a5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
 export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl }: Props) {
   const [photos] = useState(() => rawPhotos.map((p, i) => ({
     ...p,
@@ -60,6 +77,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const [mode, setMode] = useState<'stack' | 'grid'>('stack');
   const [gridViewing, setGridViewing] = useState<Photo | null>(null);
+  const [copied, setCopied] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -153,6 +171,16 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   }, []);
 
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
+
+  async function shareGallery() {
+    const url = galleryUrl || window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: coupleNames, url }); return; } catch { /* cancelled */ }
+    }
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   // Grid swipe
   const gridTouchRef = useRef({ startX: 0, startTime: 0 });
@@ -275,6 +303,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         </div>
         <div style={st.modeToggle} onClick={() => setMode('stack')} role="button" tabIndex={0}>
           <StackIcon />
+        </div>
+        <div style={st.shareToggle} onClick={shareGallery} role="button" tabIndex={0}>
+          {copied ? <CheckIcon /> : <SendIcon />}
         </div>
         {gridViewing && (
           <div
@@ -409,6 +440,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
       {/* Mode toggle */}
       <div style={st.modeToggle} onClick={() => setMode('grid')} role="button" tabIndex={0}>
         <GridIcon />
+      </div>
+      <div style={st.shareToggle} onClick={shareGallery} role="button" tabIndex={0}>
+        {copied ? <CheckIcon /> : <SendIcon />}
       </div>
 
       {/* Fullscreen view */}
@@ -770,6 +804,21 @@ const st: Record<string, React.CSSProperties> = {
     position: 'fixed',
     bottom: '24px',
     left: '24px',
+    width: '44px',
+    height: '44px',
+    borderRadius: '50%',
+    background: 'rgba(0,0,0,0.04)',
+    border: '1px solid rgba(0,0,0,0.08)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: 40,
+  },
+  shareToggle: {
+    position: 'fixed',
+    bottom: '24px',
+    right: '24px',
     width: '44px',
     height: '44px',
     borderRadius: '50%',
