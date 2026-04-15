@@ -172,58 +172,28 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     setShareAnim(true);
     setTimeout(() => setShareAnim(false), 600);
 
-    const canvas = document.createElement('canvas');
-    const W = 1080, H = 1350;
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#e2ded8';
-    ctx.fillRect(0, 0, W, H);
-
-    const img = new window.Image();
-    img.crossOrigin = 'anonymous';
-    img.src = p.url;
-    await new Promise(res => { img.onload = res; });
-
-    const printW = p.isLandscape ? 700 : 560;
-    const printH = p.isLandscape ? 560 : 700;
-    const b = 24, px = (W - printW) / 2, py = 260;
-
-    ctx.shadowColor = 'rgba(0,0,0,0.2)';
-    ctx.shadowBlur = 40; ctx.shadowOffsetY = 8;
-    ctx.fillStyle = '#f5f0e8';
-    ctx.save();
-    ctx.translate(px + printW / 2, py + printH / 2);
-    ctx.rotate(-0.008);
-    ctx.fillRect(-printW / 2, -printH / 2, printW, printH);
-    ctx.shadowColor = 'transparent';
-    ctx.drawImage(img, -printW / 2 + b, -printH / 2 + b, printW - b * 2, printH - b * 2);
-    ctx.restore();
-
-    ctx.shadowColor = 'transparent';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#8a7d6e'; ctx.font = "300 28px 'Helvetica Neue', sans-serif";
-    ctx.fillText(`${p.idx + 1}  of  ${photos.length} prints`, W / 2, py + printH + 70);
-    ctx.fillStyle = '#5a4f42'; ctx.font = "400 42px 'Georgia', serif";
-    ctx.fillText(coupleNames, W / 2, 130);
-    ctx.fillStyle = '#8a8078'; ctx.font = "300 22px 'Helvetica Neue', sans-serif";
-    ctx.fillText('open the box', W / 2, 170);
-    ctx.fillStyle = '#9a9088'; ctx.font = "300 18px 'Helvetica Neue', sans-serif";
-    ctx.fillText(galleryUrl, W / 2, H - 50);
-
-    const blob = await new Promise<Blob>(res => canvas.toBlob(b => res(b!), 'image/jpeg', 0.92));
-    const file = new File([blob], `print-${p.idx + 1}.jpg`, { type: 'image/jpeg' });
-
     try {
+      // Try fetching the image as a blob for native sharing
+      const response = await fetch(p.url);
+      const blob = await response.blob();
+      const file = new File([blob], `print-${p.idx + 1}.jpg`, { type: blob.type || 'image/jpeg' });
+
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: `${coupleNames} — Print ${p.idx + 1}` });
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = file.name; a.click();
-        URL.revokeObjectURL(url);
+        return;
       }
     } catch (err: any) {
-      if (err.name !== 'AbortError') console.error(err);
+      if (err.name === 'AbortError') return;
+      // Fall through to download fallback
     }
+
+    // Fallback: direct download
+    const a = document.createElement('a');
+    a.href = p.url;
+    a.download = `print-${p.idx + 1}.jpg`;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.click();
   }
 
   useEffect(() => {
@@ -576,7 +546,8 @@ const baseStyles = `
 
 const st: Record<string, React.CSSProperties> = {
   scene: {
-    position: 'relative',
+    position: 'fixed',
+    inset: 0,
     width: '100vw',
     height: '100vh',
     background:
@@ -589,6 +560,7 @@ const st: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    touchAction: 'none',
   },
   header: {
     textAlign: 'center',
