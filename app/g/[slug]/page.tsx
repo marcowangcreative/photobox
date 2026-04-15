@@ -58,7 +58,7 @@ export default async function GalleryPage({ params }: Props) {
       coupleNames={gallery.couple_names}
       sneakPeekLabel={gallery.sneak_peek_label}
       photos={photosWithUrls}
-      galleryUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/g/${slug}`}
+      galleryUrl={`https://box.marcowang.com/g/${slug}`}
       gridStyle={gallery.grid_style || 'stacked'}
     />
   );
