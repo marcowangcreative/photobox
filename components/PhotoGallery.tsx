@@ -172,28 +172,32 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     setShareAnim(true);
     setTimeout(() => setShareAnim(false), 600);
 
+    const fileName = `print-${p.idx + 1}.jpg`;
+
     try {
-      // Try fetching the image as a blob for native sharing
-      const response = await fetch(p.url);
+      // Proxy through our API to avoid CORS issues
+      const proxyUrl = `/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
+      const response = await fetch(proxyUrl);
       const blob = await response.blob();
-      const file = new File([blob], `print-${p.idx + 1}.jpg`, { type: blob.type || 'image/jpeg' });
+      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
 
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: `${coupleNames} — Print ${p.idx + 1}` });
         return;
       }
+
+      // Desktop fallback: download the blob directly
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
     } catch (err: any) {
       if (err.name === 'AbortError') return;
-      // Fall through to download fallback
+      // Last resort: open image in new tab
+      window.open(p.url, '_blank');
     }
-
-    // Fallback: direct download
-    const a = document.createElement('a');
-    a.href = p.url;
-    a.download = `print-${p.idx + 1}.jpg`;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.click();
   }
 
   useEffect(() => {
