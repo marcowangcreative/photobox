@@ -154,36 +154,6 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
 
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (gridViewing) setGridViewing(null);
-        else if (phase === 'viewing') dismissPhoto();
-        return;
-      }
-      if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        if (gridViewing) { setGridViewing(null); return; }
-        if (phase === 'viewing') dismissPhoto();
-        else if (phase === 'idle' && mode === 'stack') pullForward();
-      }
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        if (gridViewing) gridNext();
-        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullForward, 350); }
-        else if (phase === 'idle') pullForward();
-      }
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        if (gridViewing) gridPrev();
-        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullBackward, 350); }
-        else if (phase === 'idle') pullBackward();
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [phase, pullForward, pullBackward, dismissPhoto, mode, gridViewing, gridNext, gridPrev]);
-
   // Grid swipe
   const gridTouchRef = useRef({ startX: 0, startTime: 0 });
   const [gridDragX, setGridDragX] = useState(0);
@@ -233,6 +203,36 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     }
     setGridDragX(0);
   }, [gridDragging, gridDragX, gridNext, gridPrev]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (gridViewing) setGridViewing(null);
+        else if (phase === 'viewing') dismissPhoto();
+        return;
+      }
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        if (gridViewing) { setGridViewing(null); return; }
+        if (phase === 'viewing') dismissPhoto();
+        else if (phase === 'idle' && mode === 'stack') pullForward();
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (gridViewing) gridNext();
+        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullForward, 350); }
+        else if (phase === 'idle') pullForward();
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (gridViewing) gridPrev();
+        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullBackward, 350); }
+        else if (phase === 'idle') pullBackward();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [phase, pullForward, pullBackward, dismissPhoto, mode, gridViewing, gridNext, gridPrev]);
 
   const seenPhotos = photos.slice(0, currentIndex);
   const unseenPhotos = photos.slice(currentIndex);
