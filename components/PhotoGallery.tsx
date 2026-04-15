@@ -332,7 +332,14 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             <div style={{
               ...st.shareBtn,
               animation: shareAnim ? 'sharePop 0.4s ease' : 'none',
-            }} onClick={(e) => handleShare(e, gridViewing)} role="button" tabIndex={0}>
+            }}
+            onClick={(e) => handleShare(e, gridViewing)}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => {
+              e.stopPropagation();
+              handleShare(e as unknown as React.MouseEvent, gridViewing);
+            }}
+            role="button" tabIndex={0}>
               <ShareIcon />
             </div>
             <div style={st.photoNum}>{gridViewing.idx + 1} / {photos.length}</div>
@@ -481,7 +488,14 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               <div style={{
                 ...st.shareBtn,
                 animation: shareAnim ? 'sharePop 0.4s ease' : 'none',
-              }} onClick={(e) => handleShare(e)} role="button" tabIndex={0}>
+              }}
+              onClick={(e) => handleShare(e)}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+                handleShare(e as unknown as React.MouseEvent);
+              }}
+              role="button" tabIndex={0}>
                 <ShareIcon />
               </div>
             )}
