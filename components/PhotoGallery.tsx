@@ -751,6 +751,7 @@ const st: Record<string, React.CSSProperties> = {
   scatterScroll: {
     flex: 1,
     overflowY: 'auto',
+    overflowX: 'hidden',
     width: '100%',
     padding: '20px 10px 100px',
     position: 'relative',
