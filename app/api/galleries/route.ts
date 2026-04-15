@@ -15,13 +15,15 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const supabase = createAdminClient();
   const body = await req.json();
-  const { couple_names, sneak_peek_label } = body;
+  const { couple_names, sneak_peek_label, custom_slug } = body;
 
   if (!couple_names) {
     return NextResponse.json({ error: 'couple_names required' }, { status: 400 });
   }
 
-  const slug = generateSlug(couple_names);
+  const slug = custom_slug
+    ? custom_slug.toLowerCase().replace(/[^a-z0-9]+/g, '').replace(/(^-|-$)/g, '')
+    : generateSlug(couple_names);
 
   const { data, error } = await supabase
     .from('galleries')

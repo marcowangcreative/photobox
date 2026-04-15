@@ -27,7 +27,6 @@ export function generateSlug(coupleNames: string): string {
   return coupleNames
     .toLowerCase()
     .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-    + '-' + Math.random().toString(36).slice(2, 6);
+    .replace(/[^a-z0-9]+/g, '')
+    .replace(/(^-|-$)/g, '');
 }

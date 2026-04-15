@@ -15,6 +15,7 @@ interface Gallery {
 export default function AdminPage() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [newCouple, setNewCouple] = useState('');
+  const [customSlug, setCustomSlug] = useState('');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -34,10 +35,11 @@ export default function AdminPage() {
     const res = await fetch('/api/galleries', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ couple_names: newCouple }),
+      body: JSON.stringify({ couple_names: newCouple, ...(customSlug.trim() && { custom_slug: customSlug.trim() }) }),
     });
     const gallery = await res.json();
     setNewCouple('');
+    setCustomSlug('');
     router.push(`/admin/${gallery.id}`);
   }
 
@@ -78,6 +80,13 @@ export default function AdminPage() {
             placeholder="Couple names (e.g. Chloe & Jett)"
             value={newCouple}
             onChange={e => setNewCouple(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && createGallery()}
+          />
+          <input
+            style={{ ...s.input, flex: '0 0 180px' }}
+            placeholder="Custom URL (optional)"
+            value={customSlug}
+            onChange={e => setCustomSlug(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && createGallery()}
           />
           <button style={s.btn} onClick={createGallery}>Create</button>
