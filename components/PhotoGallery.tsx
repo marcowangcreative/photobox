@@ -962,7 +962,7 @@ const st: Record<string, React.CSSProperties> = {
     position: 'relative',
     cursor: 'pointer',
     flexShrink: 0,
-    width: '44%',
+    width: '50%',
     marginLeft: '-1.5%',
     marginRight: '-1.5%',
     marginTop: '-30px',
