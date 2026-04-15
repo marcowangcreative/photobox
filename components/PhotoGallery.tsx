@@ -281,8 +281,8 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b6159" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '24px' }}>
           <rect x="5" y="2" width="14" height="20" rx="2" />
           <line x1="12" y1="18" x2="12" y2="18.01" strokeWidth="2" />
-          <path d="M2 12l2-2m0 0l2 2m-2-2v4" />
-          <path d="M22 12l-2 2m0 0l-2-2m2 2V10" />
+          <rect x="9.5" y="8" width="5" height="4" rx="1" />
+          <path d="M10.5 8V6.5a1.5 1.5 0 0 1 3 0V8" />
         </svg>
         <div style={{
           fontFamily: 'Playfair Display, serif',
