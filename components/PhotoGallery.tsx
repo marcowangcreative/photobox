@@ -954,7 +954,7 @@ const st: Record<string, React.CSSProperties> = {
   },
   cleanItemLandscape: {
     gridColumn: 'span 2',
-    aspectRatio: '3/2',
+    aspectRatio: '4/3',
     overflow: 'hidden',
     cursor: 'pointer',
     borderRadius: '2px',
