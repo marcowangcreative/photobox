@@ -167,12 +167,22 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         if (phase === 'viewing') dismissPhoto();
         else if (phase === 'idle' && mode === 'stack') pullForward();
       }
-      if (e.key === 'ArrowRight' && phase === 'idle') pullForward();
-      if (e.key === 'ArrowLeft' && phase === 'idle') pullBackward();
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (gridViewing) gridNext();
+        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullForward, 350); }
+        else if (phase === 'idle') pullForward();
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (gridViewing) gridPrev();
+        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullBackward, 350); }
+        else if (phase === 'idle') pullBackward();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [phase, pullForward, pullBackward, dismissPhoto, mode, gridViewing]);
+  }, [phase, pullForward, pullBackward, dismissPhoto, mode, gridViewing, gridNext, gridPrev]);
 
   // Grid swipe
   const gridTouchRef = useRef({ startX: 0, startTime: 0 });
