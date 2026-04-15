@@ -60,6 +60,28 @@ function CheckIcon() {
   );
 }
 
+function ExpandIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8078" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 3 21 3 21 9" />
+      <polyline points="9 21 3 21 3 15" />
+      <line x1="21" y1="3" x2="14" y2="10" />
+      <line x1="3" y1="21" x2="10" y2="14" />
+    </svg>
+  );
+}
+
+function CollapseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="4 14 10 14 10 20" />
+      <polyline points="20 10 14 10 14 4" />
+      <line x1="14" y1="10" x2="21" y2="3" />
+      <line x1="3" y1="21" x2="10" y2="14" />
+    </svg>
+  );
+}
+
 export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked' }: Props) {
   const [photos] = useState(() => rawPhotos.map((p, i) => ({
     ...p,
@@ -84,6 +106,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [isMobile, setIsMobile] = useState(false);
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
   const [showHelper, setShowHelper] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchRef = useRef({ startX: 0, startY: 0, startTime: 0 });
   const [pinchScale, setPinchScale] = useState(1);
@@ -290,26 +313,26 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (gridViewing) setGridViewing(null);
-        else if (phase === 'viewing') dismissPhoto();
+        if (gridViewing) { setGridViewing(null); setFullscreen(false); }
+        else if (phase === 'viewing') { dismissPhoto(); setFullscreen(false); }
         return;
       }
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        if (gridViewing) { setGridViewing(null); return; }
-        if (phase === 'viewing') dismissPhoto();
+        if (gridViewing) { setGridViewing(null); setFullscreen(false); return; }
+        if (phase === 'viewing') { dismissPhoto(); setFullscreen(false); }
         else if (phase === 'idle' && mode === 'stack') pullForward();
       }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         if (gridViewing) gridNext();
-        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullForward, 350); }
+        else if (phase === 'viewing') { dismissPhoto(); setFullscreen(false); setTimeout(pullForward, 350); }
         else if (phase === 'idle') pullForward();
       }
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         if (gridViewing) gridPrev();
-        else if (phase === 'viewing') { dismissPhoto(); setTimeout(pullBackward, 350); }
+        else if (phase === 'viewing') { dismissPhoto(); setFullscreen(false); setTimeout(pullBackward, 350); }
         else if (phase === 'idle') pullBackward();
       }
     };
@@ -417,12 +440,20 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         </div>
         {gridViewing && (
           <div
-            style={st.overlay}
-            onClick={() => { if (!gridDragging && Math.abs(gridDragX) < 10) setGridViewing(null); }}
+            style={fullscreen ? { ...st.overlay, ...st.overlayFullscreen } : st.overlay}
+            onClick={() => { if (!gridDragging && Math.abs(gridDragX) < 10) { setGridViewing(null); setFullscreen(false); } }}
             onTouchStart={onGridTouchStart}
             onTouchMove={onGridTouchMove}
             onTouchEnd={onGridTouchEnd}
           >
+            {fullscreen ? (
+              <img
+                src={gridViewing.url}
+                alt=""
+                style={st.fullscreenImg}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
             <div style={{
               ...(gridViewing.isLandscape
                 ? (isMobile ? st.viewPrintLandscapeMobile : st.viewPrintLandscape)
@@ -438,7 +469,18 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             }}>
               <img src={gridViewing.url} alt="" style={st.viewImg} />
             </div>
-            <div style={st.photoNum}>{gridViewing.idx + 1} / {photos.length}</div>
+            )}
+            <div style={fullscreen ? st.photoNumFullscreen : st.photoNum}>{gridViewing.idx + 1} / {photos.length}</div>
+            {!isMobile && (
+              <div
+                style={fullscreen ? st.fullscreenToggleActive : st.fullscreenToggle}
+                onClick={(e) => { e.stopPropagation(); setFullscreen(f => !f); }}
+                role="button"
+                tabIndex={0}
+              >
+                {fullscreen ? <CollapseIcon /> : <ExpandIcon />}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -560,16 +602,24 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         <>
           <div
             style={{
-              ...st.overlay,
+              ...(fullscreen ? { ...st.overlay, ...st.overlayFullscreen } : st.overlay),
               animation: phase === 'discarding'
                 ? (direction === 'forward' ? 'discardLeft 0.32s ease-in forwards' : 'discardRight 0.32s ease-in forwards')
                 : phase === 'pulling' ? 'fadeIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) forwards' : undefined,
             }}
-            onClick={phase === 'viewing' && !dragging ? dismissPhoto : undefined}
+            onClick={phase === 'viewing' && !dragging ? () => { dismissPhoto(); setFullscreen(false); } : undefined}
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
+            {fullscreen ? (
+              <img
+                src={viewingPhoto.url}
+                alt=""
+                style={st.fullscreenImg}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
             <div style={{
               ...(viewingPhoto.isLandscape
                 ? (isMobile ? st.viewPrintLandscapeMobile : st.viewPrintLandscape)
@@ -585,13 +635,24 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             }}>
               <img src={viewingPhoto.url} alt="" style={st.viewImg} />
             </div>
+            )}
           </div>
           <div style={{
-            ...st.photoNum,
+            ...(fullscreen ? st.photoNumFullscreen : st.photoNum),
             animation: phase === 'discarding' ? 'fadeOut 0.25s ease forwards' : 'fadeIn 0.35s ease forwards',
           }}>
             {viewingPhoto.idx + 1} / {photos.length}
           </div>
+          {!isMobile && (
+            <div
+              style={fullscreen ? st.fullscreenToggleActive : st.fullscreenToggle}
+              onClick={() => setFullscreen(f => !f)}
+              role="button"
+              tabIndex={0}
+            >
+              {fullscreen ? <CollapseIcon /> : <ExpandIcon />}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -1050,5 +1111,57 @@ const st: Record<string, React.CSSProperties> = {
     letterSpacing: '2px',
     fontWeight: 300,
     zIndex: 55,
+  },
+  photoNumFullscreen: {
+    position: 'fixed',
+    bottom: '18px',
+    right: '22px',
+    fontSize: '12px',
+    color: 'rgba(255,255,255,0.5)',
+    letterSpacing: '2px',
+    fontWeight: 300,
+    zIndex: 55,
+  },
+  overlayFullscreen: {
+    background: 'rgba(0, 0, 0, 0.92)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
+  },
+  fullscreenImg: {
+    maxWidth: '95vw',
+    maxHeight: '90vh',
+    objectFit: 'contain',
+    display: 'block',
+    borderRadius: '2px',
+  },
+  fullscreenToggle: {
+    position: 'fixed',
+    top: '18px',
+    right: '22px',
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    background: 'rgba(225, 221, 215, 0.6)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: 55,
+    transition: 'background 0.2s',
+  },
+  fullscreenToggleActive: {
+    position: 'fixed',
+    top: '18px',
+    right: '22px',
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    background: 'rgba(255, 255, 255, 0.12)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    zIndex: 55,
+    transition: 'background 0.2s',
   },
 };
