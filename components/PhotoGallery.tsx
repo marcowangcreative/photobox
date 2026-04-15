@@ -393,7 +393,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             <div
               key={photo.id}
               style={{
-                ...st.pilePrint,
+                ...(photo.isLandscape ? st.pilePrintLandscape : st.pilePrint),
                 transform: `rotate(${photo.stackRotation * 3}deg) translate(${photo.stackX * 3}px, ${photo.stackY * 2}px)`,
                 zIndex: i,
               }}
@@ -624,6 +624,17 @@ const st: Record<string, React.CSSProperties> = {
     top: 0, left: 0,
     width: '80px',
     height: '120px',
+    background: '#f5f0e8',
+    padding: '4px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)',
+    display: 'flex',
+    overflow: 'hidden',
+  },
+  pilePrintLandscape: {
+    position: 'absolute',
+    top: '20px', left: '-20px',
+    width: '120px',
+    height: '80px',
     background: '#f5f0e8',
     padding: '4px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)',
