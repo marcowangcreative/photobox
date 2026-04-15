@@ -180,6 +180,15 @@ export default function GalleryEditor() {
                   value={gallery.sneak_peek_label}
                   onChange={e => updateGallery({ sneak_peek_label: e.target.value })}
                 />
+                <label style={{ ...s.label, marginTop: '12px' }}>URL Slug</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ ...s.label, marginTop: 0, color: '#8a8078' }}>/g/</span>
+                  <input
+                    style={s.input}
+                    value={gallery.slug}
+                    onChange={e => updateGallery({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') })}
+                  />
+                </div>
               </div>
               <div style={s.sidebar}>
                 <div style={s.linkBox}>
