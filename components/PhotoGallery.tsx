@@ -42,16 +42,6 @@ function StackIcon({ color = '#6b6159' }: { color?: string }) {
   );
 }
 
-function ShareIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b6159" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7" />
-      <polyline points="16 6 12 2 8 6" />
-      <line x1="12" y1="2" x2="12" y2="15" />
-    </svg>
-  );
-}
-
 export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl }: Props) {
   const [photos] = useState(() => rawPhotos.map((p, i) => ({
     ...p,
@@ -70,14 +60,12 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const [mode, setMode] = useState<'stack' | 'grid'>('stack');
   const [gridViewing, setGridViewing] = useState<Photo | null>(null);
-  const [shareAnim, setShareAnim] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchRef = useRef({ startX: 0, startY: 0, startTime: 0 });
-  const shareBlobRef = useRef<{ url: string; file: File } | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -166,57 +154,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
 
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
 
-  // Pre-fetch image blob when a photo is enlarged so share is instant
-  useEffect(() => {
-    const p = gridViewing || viewingPhoto;
-    if (!p) return;
-    if (shareBlobRef.current?.url === p.url) return;
-    shareBlobRef.current = null;
-    const fileName = `print-${p.idx + 1}.jpg`;
-    const proxyUrl = `${window.location.origin}/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
-    fetch(proxyUrl)
-      .then(res => res.blob())
-      .then(blob => {
-        const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
-        shareBlobRef.current = { url: p.url, file };
-      })
-      .catch(() => {});
-  }, [gridViewing, viewingPhoto]);
-
-  async function handleShare(e: React.MouseEvent, photo?: Photo) {
-    e.stopPropagation();
-    const p = photo || viewingPhoto;
-    if (!p) return;
-    setShareAnim(true);
-    setTimeout(() => setShareAnim(false), 600);
-
-    // Use pre-fetched blob if available (keeps iOS gesture chain intact)
-    const cached = shareBlobRef.current;
-    if (cached?.url === p.url && navigator.canShare?.({ files: [cached.file] })) {
-      try {
-        await navigator.share({ files: [cached.file] });
-        return;
-      } catch (err: any) {
-        if (err.name === 'AbortError') return;
-      }
-    }
-
-    // Fallback: fetch inline (may break iOS gesture chain but works on desktop)
-    const fileName = `print-${p.idx + 1}.jpg`;
-    const proxyUrl = `${window.location.origin}/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
-    try {
-      const res = await fetch(proxyUrl);
-      const blob = await res.blob();
-      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file] });
-        return;
-      }
-    } catch (err: any) {
-      if (err.name === 'AbortError') return;
-    }
-
-    window.open(proxyUrl, '_blank');
+  function proxyImgUrl(photo: Photo) {
+    const fileName = `print-${photo.idx + 1}.jpg`;
+    return `/api/share?url=${encodeURIComponent(photo.url)}&name=${encodeURIComponent(fileName)}`;
   }
 
   useEffect(() => {
@@ -350,20 +290,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               transition: 'none',
               opacity: gridDragging ? Math.max(0.5, 1 - Math.abs(gridDragX) / 350) : 1,
             }}>
-              <img src={gridViewing.url} alt="" style={st.viewImg} />
-            </div>
-            <div style={{
-              ...st.shareBtn,
-              animation: shareAnim ? 'sharePop 0.4s ease' : 'none',
-            }}
-            onClick={(e) => handleShare(e, gridViewing)}
-            onTouchStart={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => {
-              e.stopPropagation();
-              handleShare(e as unknown as React.MouseEvent, gridViewing);
-            }}
-            role="button" tabIndex={0}>
-              <ShareIcon />
+              <img src={proxyImgUrl(gridViewing)} alt="" style={st.viewImg} />
             </div>
             <div style={st.photoNum}>{gridViewing.idx + 1} / {photos.length}</div>
           </div>
@@ -505,23 +432,8 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               transition: dragging ? 'none' : 'transform 0.25s ease',
               opacity: dragging ? Math.max(0.4, 1 - Math.abs(dragX) / 400) : 1,
             }}>
-              <img src={viewingPhoto.url} alt="" style={st.viewImg} />
+              <img src={proxyImgUrl(viewingPhoto)} alt="" style={st.viewImg} />
             </div>
-            {phase === 'viewing' && !dragging && (
-              <div style={{
-                ...st.shareBtn,
-                animation: shareAnim ? 'sharePop 0.4s ease' : 'none',
-              }}
-              onClick={(e) => handleShare(e)}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => {
-                e.stopPropagation();
-                handleShare(e as unknown as React.MouseEvent);
-              }}
-              role="button" tabIndex={0}>
-                <ShareIcon />
-              </div>
-            )}
           </div>
           <div style={{
             ...st.photoNum,
@@ -569,11 +481,6 @@ const baseStyles = `
   @keyframes breathe {
     0%, 100% { box-shadow: 0 8px 40px rgba(0,0,0,0.12); }
     50% { box-shadow: 0 14px 60px rgba(0,0,0,0.2); }
-  }
-  @keyframes sharePop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
   }
   @keyframes lidShrink {
     0% { opacity: 1; transform: scale(1); }
@@ -914,21 +821,6 @@ const st: Record<string, React.CSSProperties> = {
     height: '100%',
     objectFit: 'cover',
     display: 'block',
-  },
-  shareBtn: {
-    position: 'absolute',
-    top: '24px',
-    right: '24px',
-    width: '44px',
-    height: '44px',
-    borderRadius: '50%',
-    background: 'rgba(0,0,0,0.04)',
-    border: '1px solid rgba(0,0,0,0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    zIndex: 60,
   },
   photoNum: {
     position: 'fixed',

@@ -17,10 +17,12 @@ export async function GET(req: NextRequest) {
   }
 
   const blob = await response.blob();
+  const disposition = req.nextUrl.searchParams.get('dl') === '1' ? 'attachment' : 'inline';
   return new NextResponse(blob, {
     headers: {
       'Content-Type': blob.type || 'image/jpeg',
-      'Content-Disposition': `attachment; filename="${req.nextUrl.searchParams.get('name') || 'photo.jpg'}"`,
+      'Content-Disposition': `${disposition}; filename="${req.nextUrl.searchParams.get('name') || 'photo.jpg'}"`,
+      'Cache-Control': 'public, max-age=31536000, immutable',
     },
   });
 }
