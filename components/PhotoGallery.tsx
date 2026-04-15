@@ -454,7 +454,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
 
 const baseStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
   @keyframes fadeIn {
     0% { opacity: 0; transform: scale(0.92) translateY(16px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
