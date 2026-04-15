@@ -173,31 +173,23 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     setTimeout(() => setShareAnim(false), 600);
 
     const fileName = `print-${p.idx + 1}.jpg`;
+    const proxyUrl = `${window.location.origin}/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
 
-    try {
-      // Proxy through our API to avoid CORS issues
-      const proxyUrl = `/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
-      const response = await fetch(proxyUrl);
-      const blob = await response.blob();
-      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
-
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: `${coupleNames} — Print ${p.idx + 1}` });
+    // On mobile: use native share with the direct download URL
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${coupleNames} — Print ${p.idx + 1}`,
+          url: proxyUrl,
+        });
         return;
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
       }
-
-      // Desktop fallback: download the blob directly
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(blobUrl);
-    } catch (err: any) {
-      if (err.name === 'AbortError') return;
-      // Last resort: open image in new tab
-      window.open(p.url, '_blank');
     }
+
+    // Desktop/fallback: trigger download via proxy
+    window.open(proxyUrl, '_blank');
   }
 
   useEffect(() => {
