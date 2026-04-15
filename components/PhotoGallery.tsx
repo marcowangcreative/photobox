@@ -299,6 +299,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const seenPhotos = photos.slice(0, currentIndex);
   const unseenPhotos = photos.slice(currentIndex);
 
+  // When viewing a photo forward, offset the tray so the next photo shows underneath
+  const isForwardActive = direction === 'forward' && (phase === 'pulling' || phase === 'viewing' || phase === 'discarding');
+  const trayPhotos = isForwardActive ? unseenPhotos.slice(1) : unseenPhotos;
+
   // ——— GRID VIEW (scattered overlap) ———
   if (mode === 'grid') {
     return (
@@ -409,7 +413,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                   role="button"
                   tabIndex={0}
                 >
-                  {unseenPhotos.slice(1, 4).map((p, i) => (
+                  {trayPhotos.slice(1, 4).map((p, i) => (
                     <div
                       key={p.id}
                       style={{
@@ -422,21 +426,23 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                       <div style={st.stackedPrintInner} />
                     </div>
                   ))}
-                  <div style={{
-                    ...(unseenPhotos[0].isLandscape ? st.topPrintLandscape : st.topPrint),
-                    transform: phase === 'pulling' && direction === 'forward'
-                      ? (unseenPhotos[0].isLandscape
-                        ? 'translate(-50%,-50%) rotate(90deg) scale(0.96)'
-                        : 'scale(0.96)')
-                      : (unseenPhotos[0].isLandscape
-                        ? 'translate(-50%,-50%) rotate(90deg)'
-                        : 'none'),
-                    opacity: 1,
-                  }}>
-                    <div style={st.topPrintBorder}>
-                      <img src={unseenPhotos[0].url} alt="" style={st.topImg} />
+                  {trayPhotos.length > 0 ? (
+                    <div style={{
+                      ...(trayPhotos[0].isLandscape ? st.topPrintLandscape : st.topPrint),
+                      transform: phase === 'pulling' && direction === 'forward'
+                        ? (trayPhotos[0].isLandscape
+                          ? 'translate(-50%,-50%) rotate(90deg) scale(0.96)'
+                          : 'scale(0.96)')
+                        : (trayPhotos[0].isLandscape
+                          ? 'translate(-50%,-50%) rotate(90deg)'
+                          : 'none'),
+                      opacity: 1,
+                    }}>
+                      <div style={st.topPrintBorder}>
+                        <img src={trayPhotos[0].url} alt="" style={st.topImg} />
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
               ) : (
                 <div style={st.doneState} onClick={resetGallery} role="button" tabIndex={0}>
