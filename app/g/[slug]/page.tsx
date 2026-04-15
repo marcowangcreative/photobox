@@ -59,6 +59,7 @@ export default async function GalleryPage({ params }: Props) {
       sneakPeekLabel={gallery.sneak_peek_label}
       photos={photosWithUrls}
       galleryUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/g/${slug}`}
+      gridStyle={gallery.grid_style || 'stacked'}
     />
   );
 }

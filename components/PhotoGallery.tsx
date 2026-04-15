@@ -14,6 +14,7 @@ interface Props {
   sneakPeekLabel: string;
   photos: PhotoData[];
   galleryUrl: string;
+  gridStyle?: 'stacked' | 'clean';
 }
 
 function GridIcon({ color = '#6b6159' }: { color?: string }) {
@@ -59,7 +60,7 @@ function CheckIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked' }: Props) {
   const [photos] = useState(() => rawPhotos.map((p, i) => ({
     ...p,
     idx: i,
@@ -360,7 +361,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const isForwardActive = direction === 'forward' && (phase === 'pulling' || phase === 'viewing' || phase === 'discarding');
   const trayPhotos = isForwardActive ? unseenPhotos.slice(1) : unseenPhotos;
 
-  // ——— GRID VIEW (scattered overlap) ———
+  // ——— GRID VIEW ———
   if (mode === 'grid') {
     return (
       <div style={st.scene}>
@@ -368,29 +369,45 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         <div style={st.header}>
           <h1 style={st.title}>{coupleNames}</h1>
         </div>
-        <div style={st.scatterScroll}>
-          <div style={st.scatterContainer}>
-            {photos.map((photo, i) => {
-              const rot = photo.stackRotation * 2.5;
-              const offsetX = ((i % 3) - 1) * 18 + photo.stackX * 4;
-              return (
+        <div style={gridStyle === 'clean' ? st.cleanScroll : st.scatterScroll}>
+          {gridStyle === 'clean' ? (
+            <div style={st.cleanGrid}>
+              {photos.map((photo) => (
                 <div
                   key={photo.id}
                   style={{
-                    ...(photo.isLandscape ? st.scatterItemLandscape : st.scatterItem),
-                    zIndex: Math.min(i, 40),
-                    transform: `rotate(${rot}deg) translateX(${offsetX}px)`,
-                    marginTop: i < 3 ? '0px' : '-30px',
+                    ...(photo.isLandscape ? st.cleanItemLandscape : st.cleanItem),
                   }}
                   onClick={() => setGridViewing(photo)}
                 >
-                  <div style={photo.isLandscape ? st.scatterPrintLandscape : st.scatterPrint}>
-                    <img src={photo.url} alt="" style={st.scatterImg} loading="lazy" />
-                  </div>
+                  <img src={photo.url} alt="" style={st.cleanImg} loading="lazy" />
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div style={st.scatterContainer}>
+              {photos.map((photo, i) => {
+                const rot = photo.stackRotation * 2.5;
+                const offsetX = ((i % 3) - 1) * 18 + photo.stackX * 4;
+                return (
+                  <div
+                    key={photo.id}
+                    style={{
+                      ...(photo.isLandscape ? st.scatterItemLandscape : st.scatterItem),
+                      zIndex: Math.min(i, 40),
+                      transform: `rotate(${rot}deg) translateX(${offsetX}px)`,
+                      marginTop: i < 3 ? '0px' : '-30px',
+                    }}
+                    onClick={() => setGridViewing(photo)}
+                  >
+                    <div style={photo.isLandscape ? st.scatterPrintLandscape : st.scatterPrint}>
+                      <img src={photo.url} alt="" style={st.scatterImg} loading="lazy" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
         <div style={st.modeToggle} onClick={() => setMode('stack')} role="button" tabIndex={0}>
           <StackIcon />
@@ -907,6 +924,42 @@ const st: Record<string, React.CSSProperties> = {
     boxShadow: '0 2px 12px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)',
   },
   scatterImg: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  cleanScroll: {
+    flex: 1,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    width: '100%',
+    padding: '12px 12px 100px',
+    position: 'relative',
+    zIndex: 1,
+  } as React.CSSProperties,
+  cleanGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '3px',
+    maxWidth: '540px',
+    margin: '0 auto',
+  },
+  cleanItem: {
+    gridColumn: 'span 1',
+    aspectRatio: '2/3',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    borderRadius: '2px',
+  },
+  cleanItemLandscape: {
+    gridColumn: 'span 2',
+    aspectRatio: '3/2',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    borderRadius: '2px',
+  },
+  cleanImg: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',

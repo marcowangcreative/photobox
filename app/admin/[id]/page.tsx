@@ -19,6 +19,7 @@ interface Gallery {
   couple_names: string;
   sneak_peek_label: string;
   is_published: boolean;
+  grid_style: 'stacked' | 'clean';
 }
 
 export default function GalleryEditor() {
@@ -210,6 +211,24 @@ export default function GalleryEditor() {
                     value={gallery.slug}
                     onChange={e => updateGallery({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') })}
                   />
+                </div>
+                <label style={{ ...s.label, marginTop: '12px' }}>Grid Style</label>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {[
+                    { key: 'stacked', label: 'Stacked' },
+                    { key: 'clean', label: 'Clean Grid' },
+                  ].map(opt => (
+                    <button
+                      key={opt.key}
+                      style={{
+                        ...s.sortBtn,
+                        ...(gallery.grid_style === opt.key ? s.sortBtnActive : {}),
+                      }}
+                      onClick={() => updateGallery({ grid_style: opt.key as Gallery['grid_style'] })}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
               </div>
               <div style={s.sidebar}>
