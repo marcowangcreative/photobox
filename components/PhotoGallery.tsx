@@ -175,17 +175,17 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     const fileName = `print-${p.idx + 1}.jpg`;
     const proxyUrl = `${window.location.origin}/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
 
-    // On mobile: use native share with the direct download URL
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${coupleNames} — Print ${p.idx + 1}`,
-          url: proxyUrl,
-        });
+    try {
+      const res = await fetch(proxyUrl);
+      const blob = await res.blob();
+      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] });
         return;
-      } catch (err: any) {
-        if (err.name === 'AbortError') return;
       }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
     }
 
     // Desktop/fallback: trigger download via proxy
@@ -775,7 +775,9 @@ const st: Record<string, React.CSSProperties> = {
     overflowY: 'auto',
     width: '100%',
     padding: '20px 10px 100px',
-  },
+    position: 'relative',
+    zIndex: 1,
+  } as React.CSSProperties,
   scatterContainer: {
     display: 'flex',
     flexWrap: 'wrap',
