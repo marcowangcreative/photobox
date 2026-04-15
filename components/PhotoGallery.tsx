@@ -287,7 +287,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                   key={photo.id}
                   style={{
                     ...(photo.isLandscape ? st.scatterItemLandscape : st.scatterItem),
-                    zIndex: i,
+                    zIndex: Math.min(i, 40),
                     transform: `rotate(${rot}deg) translateX(${offsetX}px)`,
                     marginTop: i < 3 ? '0px' : '-30px',
                   }}
