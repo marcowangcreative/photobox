@@ -492,7 +492,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     <div style={st.scene}>
       <style>{baseStyles}</style>
 
-      <div style={st.stackWorkspace}>
+      <div style={{
+        ...st.stackWorkspace,
+        ...(isMobile ? {} : { transform: 'scale(1.35)', transformOrigin: 'center center' }),
+      }}>
         {/* Seen pile */}
         <div
           style={{
