@@ -154,11 +154,6 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
 
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
 
-  function proxyImgUrl(photo: Photo) {
-    const fileName = `print-${photo.idx + 1}.jpg`;
-    return `/api/share?url=${encodeURIComponent(photo.url)}&name=${encodeURIComponent(fileName)}`;
-  }
-
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -290,7 +285,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               transition: 'none',
               opacity: gridDragging ? Math.max(0.5, 1 - Math.abs(gridDragX) / 350) : 1,
             }}>
-              <img src={proxyImgUrl(gridViewing)} alt="" style={st.viewImg} />
+              <img src={gridViewing.url} alt="" style={st.viewImg} />
             </div>
             <div style={st.photoNum}>{gridViewing.idx + 1} / {photos.length}</div>
           </div>
@@ -432,7 +427,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               transition: dragging ? 'none' : 'transform 0.25s ease',
               opacity: dragging ? Math.max(0.4, 1 - Math.abs(dragX) / 400) : 1,
             }}>
-              <img src={proxyImgUrl(viewingPhoto)} alt="" style={st.viewImg} />
+              <img src={viewingPhoto.url} alt="" style={st.viewImg} />
             </div>
           </div>
           <div style={{
