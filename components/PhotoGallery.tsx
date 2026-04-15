@@ -82,6 +82,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [dragging, setDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
+  const [showHelper, setShowHelper] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchRef = useRef({ startX: 0, startY: 0, startTime: 0 });
 
@@ -261,6 +262,43 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [phase, pullForward, pullBackward, dismissPhoto, mode, gridViewing, gridNext, gridPrev]);
+
+  // ——— ORIENTATION HELPER SCREEN ———
+  if (showHelper && isMobile) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: '#faf8f4',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'DM Sans, sans-serif',
+        color: '#6b6159',
+        padding: '40px',
+        textAlign: 'center',
+        animation: 'fadeInSimple 0.4s ease',
+      }} onClick={() => setShowHelper(false)}>
+        <style>{baseStyles}</style>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b6159" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '24px' }}>
+          <rect x="5" y="2" width="14" height="20" rx="2" />
+          <line x1="12" y1="18" x2="12" y2="18.01" strokeWidth="2" />
+          <path d="M2 12l2-2m0 0l2 2m-2-2v4" />
+          <path d="M22 12l-2 2m0 0l-2-2m2 2V10" />
+        </svg>
+        <div style={{
+          fontFamily: 'Playfair Display, serif',
+          fontSize: '22px', fontWeight: 600,
+          marginBottom: '12px', color: '#3d3630',
+        }}>Lock your orientation</div>
+        <div style={{ fontSize: '14px', lineHeight: 1.6, opacity: 0.7, maxWidth: '260px' }}>
+          For the best experience, lock your phone to portrait mode before viewing.
+        </div>
+        <div style={{
+          marginTop: '40px', fontSize: '13px',
+          opacity: 0.4, letterSpacing: '0.5px',
+        }}>tap anywhere to continue</div>
+      </div>
+    );
+  }
 
   const seenPhotos = photos.slice(0, currentIndex);
   const unseenPhotos = photos.slice(currentIndex);
