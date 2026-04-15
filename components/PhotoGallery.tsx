@@ -53,14 +53,14 @@ function ShareIcon() {
 }
 
 export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl }: Props) {
-  const photos = rawPhotos.map((p, i) => ({
+  const [photos] = useState(() => rawPhotos.map((p, i) => ({
     ...p,
     idx: i,
     isLandscape: p.is_landscape,
     stackRotation: (Math.random() - 0.5) * 2.5,
     stackX: (Math.random() - 0.5) * 4,
     stackY: (Math.random() - 0.5) * 3,
-  }));
+  })));
 
   type Photo = typeof photos[0];
 
