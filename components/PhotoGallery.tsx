@@ -85,6 +85,8 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [showHelper, setShowHelper] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchRef = useRef({ startX: 0, startY: 0, startTime: 0 });
+  const [pinchScale, setPinchScale] = useState(1);
+  const pinchRef = useRef({ initialDist: 0, baseScale: 1 });
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -138,22 +140,46 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
 
   const dismissPhoto = useCallback(() => dismissInDirection(direction), [dismissInDirection, direction]);
 
+  const getTouchDist = (e: React.TouchEvent) => {
+    const [a, b] = [e.touches[0], e.touches[1]];
+    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  };
+
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (phase !== 'viewing') return;
+    if (e.touches.length === 2) {
+      pinchRef.current = { initialDist: getTouchDist(e), baseScale: pinchScale };
+      setDragging(false);
+      return;
+    }
+    if (pinchScale > 1) return; // don't start drag while zoomed
     const t = e.touches[0];
     touchRef.current = { startX: t.clientX, startY: t.clientY, startTime: Date.now() };
     setDragging(true);
     setDragX(0);
-  }, [phase]);
+  }, [phase, pinchScale]);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!dragging || phase !== 'viewing') return;
+    if (phase !== 'viewing') return;
+    if (e.touches.length === 2) {
+      const dist = getTouchDist(e);
+      const newScale = Math.min(4, Math.max(1, pinchRef.current.baseScale * (dist / pinchRef.current.initialDist)));
+      setPinchScale(newScale);
+      return;
+    }
+    if (!dragging) return;
     setDragX(e.touches[0].clientX - touchRef.current.startX);
   }, [dragging, phase]);
 
   const onTouchEnd = useCallback(() => {
-    if (!dragging || phase !== 'viewing') { setDragging(false); return; }
+    if (pinchScale > 1.1 && !dragging) {
+      // Still zoomed — snap back to 1 on release
+      setPinchScale(1);
+      return;
+    }
+    if (!dragging || phase !== 'viewing') { setDragging(false); setPinchScale(1); return; }
     setDragging(false);
+    setPinchScale(1);
     const dx = dragX;
     const velocity = Math.abs(dx) / (Date.now() - touchRef.current.startTime);
     if (Math.abs(dx) > 80 || velocity > 0.5) {
@@ -165,7 +191,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     } else {
       setDragX(0);
     }
-  }, [dragging, dragX, phase, currentIndex, photos.length, dismissInDirection]);
+  }, [dragging, dragX, phase, currentIndex, photos.length, dismissInDirection, pinchScale]);
 
   const resetGallery = useCallback(() => {
     setCurrentIndex(0); setViewingPhoto(null); setPhase('idle'); setLidState('closed');
@@ -207,21 +233,42 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     }
   }, [gridViewing, photos]);
 
+  const [gridPinchScale, setGridPinchScale] = useState(1);
+  const gridPinchRef = useRef({ initialDist: 0, baseScale: 1 });
+
   const onGridTouchStart = useCallback((e: React.TouchEvent) => {
     if (!gridViewing) return;
+    if (e.touches.length === 2) {
+      gridPinchRef.current = { initialDist: getTouchDist(e), baseScale: gridPinchScale };
+      setGridDragging(false);
+      return;
+    }
+    if (gridPinchScale > 1) return;
     gridTouchRef.current = { startX: e.touches[0].clientX, startTime: Date.now() };
     setGridDragging(true);
     setGridDragX(0);
-  }, [gridViewing]);
+  }, [gridViewing, gridPinchScale]);
 
   const onGridTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!gridViewing) return;
+    if (e.touches.length === 2) {
+      const dist = getTouchDist(e);
+      const newScale = Math.min(4, Math.max(1, gridPinchRef.current.baseScale * (dist / gridPinchRef.current.initialDist)));
+      setGridPinchScale(newScale);
+      return;
+    }
     if (!gridDragging) return;
     setGridDragX(e.touches[0].clientX - gridTouchRef.current.startX);
-  }, [gridDragging]);
+  }, [gridDragging, gridViewing]);
 
   const onGridTouchEnd = useCallback(() => {
+    if (gridPinchScale > 1.1 && !gridDragging) {
+      setGridPinchScale(1);
+      return;
+    }
     if (!gridDragging) return;
     setGridDragging(false);
+    setGridPinchScale(1);
     const dx = gridDragX;
     const velocity = Math.abs(dx) / (Date.now() - gridTouchRef.current.startTime);
     if (Math.abs(dx) > 60 || velocity > 0.4) {
@@ -231,7 +278,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
       setGridViewing(null);
     }
     setGridDragX(0);
-  }, [gridDragging, gridDragX, gridNext, gridPrev]);
+  }, [gridDragging, gridDragX, gridNext, gridPrev, gridPinchScale]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -360,8 +407,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               animation: gridAnimDir ? (gridAnimDir === 'left' ? 'slideOutLeft 0.2s ease forwards' : 'slideOutRight 0.2s ease forwards') : 'fadeInSimple 0.3s ease forwards',
               transform: gridDragging
                 ? `translate(${gridDragX}px, 0) rotate(${gridDragX * 0.03}deg)`
-                : (gridViewing.isLandscape && isMobile ? 'rotate(90deg)' : 'rotate(-0.3deg)'),
-              transition: 'none',
+                : gridPinchScale > 1
+                  ? `scale(${gridPinchScale})${gridViewing.isLandscape && isMobile ? ' rotate(90deg)' : ''}`
+                  : (gridViewing.isLandscape && isMobile ? 'rotate(90deg)' : 'rotate(-0.3deg)'),
+              transition: gridPinchScale > 1 ? 'none' : 'transform 0.25s ease',
               opacity: gridDragging ? Math.max(0.5, 1 - Math.abs(gridDragX) / 350) : 1,
             }}>
               <img src={gridViewing.url} alt="" style={st.viewImg} />
@@ -505,8 +554,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               animation: phase === 'viewing' && !dragging ? 'breathe 3.5s ease-in-out infinite' : 'none',
               transform: dragging && phase === 'viewing'
                 ? `translate(${dragX}px, ${Math.abs(dragX) * 0.15}px) rotate(${dragX * 0.04}deg)`
-                : (viewingPhoto.isLandscape && isMobile ? 'rotate(90deg)' : 'rotate(-0.3deg)'),
-              transition: dragging ? 'none' : 'transform 0.25s ease',
+                : pinchScale > 1
+                  ? `scale(${pinchScale})${viewingPhoto.isLandscape && isMobile ? ' rotate(90deg)' : ''}`
+                  : (viewingPhoto.isLandscape && isMobile ? 'rotate(90deg)' : 'rotate(-0.3deg)'),
+              transition: dragging || pinchScale > 1 ? 'none' : 'transform 0.25s ease',
               opacity: dragging ? Math.max(0.4, 1 - Math.abs(dragX) / 400) : 1,
             }}>
               <img src={viewingPhoto.url} alt="" style={st.viewImg} />
