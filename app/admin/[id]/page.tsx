@@ -9,6 +9,7 @@ interface Photo {
   filename: string;
   is_landscape: boolean;
   sort_order: number;
+  created_at: string;
   url: string;
 }
 
@@ -33,6 +34,7 @@ export default function GalleryEditor() {
   const [saving, setSaving] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dropIdx, setDropIdx] = useState<number | null>(null);
+  const [sortMode, setSortMode] = useState<'custom' | 'name-asc' | 'name-desc' | 'time-asc' | 'time-desc'>('custom');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
   const abortRef = useRef(false);
@@ -129,6 +131,26 @@ export default function GalleryEditor() {
         body: JSON.stringify({ id: gallery.id, ...updates }),
       });
     }, 500);
+  }
+
+  function applySortMode(mode: typeof sortMode) {
+    setSortMode(mode);
+    if (mode === 'custom') {
+      // Re-fetch from server to get saved custom order
+      fetchPhotos();
+      return;
+    }
+    const sorted = [...photos].sort((a, b) => {
+      switch (mode) {
+        case 'name-asc': return a.filename.localeCompare(b.filename, undefined, { numeric: true });
+        case 'name-desc': return b.filename.localeCompare(a.filename, undefined, { numeric: true });
+        case 'time-asc': return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'time-desc': return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        default: return 0;
+      }
+    });
+    setPhotos(sorted);
+    saveOrder(sorted);
   }
 
   function handleFileDrop(e: React.DragEvent) {
@@ -257,7 +279,32 @@ export default function GalleryEditor() {
             {/* Thumbnail grid */}
             {photos.length > 0 && (
               <>
-                <p style={s.reorderHint}>Drag to reorder. First photo shows on top of the stack.</p>
+                <div style={s.sortBar}>
+                  <span style={s.sortLabel}>Sort by</span>
+                  <div style={s.sortOptions}>
+                    {[
+                      { key: 'custom', label: 'Custom' },
+                      { key: 'name-asc', label: 'Name A→Z' },
+                      { key: 'name-desc', label: 'Name Z→A' },
+                      { key: 'time-asc', label: 'Oldest first' },
+                      { key: 'time-desc', label: 'Newest first' },
+                    ].map(opt => (
+                      <button
+                        key={opt.key}
+                        style={{
+                          ...s.sortBtn,
+                          ...(sortMode === opt.key ? s.sortBtnActive : {}),
+                        }}
+                        onClick={() => applySortMode(opt.key as typeof sortMode)}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {sortMode === 'custom' && (
+                  <p style={s.reorderHint}>Drag to reorder. First photo shows on top of the stack.</p>
+                )}
                 <div style={s.photoGrid}>
                   {photos.map((photo, idx) => (
                     <div
@@ -266,11 +313,12 @@ export default function GalleryEditor() {
                         ...s.photoCard,
                         opacity: dragIdx === idx ? 0.4 : 1,
                         outline: dropIdx === idx ? '2px solid #5a5248' : 'none',
+                        cursor: sortMode === 'custom' ? 'grab' : 'default',
                       }}
-                      draggable
-                      onDragStart={() => handleDragStart(idx)}
-                      onDragOver={e => handleDragOver(e, idx)}
-                      onDrop={() => handleDropReorder(idx)}
+                      draggable={sortMode === 'custom'}
+                      onDragStart={() => sortMode === 'custom' && handleDragStart(idx)}
+                      onDragOver={e => sortMode === 'custom' && handleDragOver(e, idx)}
+                      onDrop={() => sortMode === 'custom' && handleDropReorder(idx)}
                       onDragEnd={() => { setDragIdx(null); setDropIdx(null); }}
                     >
                       <img src={photo.url} alt={photo.filename} style={s.photoThumb} />
@@ -440,6 +488,41 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: '#8a8078',
     marginBottom: '12px',
+  },
+  sortBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    marginBottom: '14px',
+    flexWrap: 'wrap' as const,
+  },
+  sortLabel: {
+    fontSize: '11px',
+    fontWeight: 500,
+    color: '#8a7d6e',
+    letterSpacing: '1px',
+    textTransform: 'uppercase' as const,
+  },
+  sortOptions: {
+    display: 'flex',
+    gap: '6px',
+    flexWrap: 'wrap' as const,
+  },
+  sortBtn: {
+    padding: '5px 12px',
+    fontSize: '12px',
+    color: '#8a7d6e',
+    background: '#fff',
+    border: '1px solid #d0ccc6',
+    borderRadius: '20px',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+    transition: 'all 0.15s ease',
+  },
+  sortBtnActive: {
+    color: '#fff',
+    background: '#5a5248',
+    borderColor: '#5a5248',
   },
   photoGrid: {
     display: 'grid',
