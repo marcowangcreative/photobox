@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Prints',
+  title: 'Photobox',
   description: 'Wedding photo galleries that feel like opening a box of prints.',
 };
 

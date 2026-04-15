@@ -9,7 +9,7 @@ export default function Home() {
       `}</style>
 
       <div style={s.content}>
-        <h1 style={s.title}>Prints</h1>
+        <h1 style={s.title}>Photobox</h1>
         <p style={s.sub}>
           Wedding galleries that feel like opening a box of prints.
         </p>
