@@ -77,6 +77,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchRef = useRef({ startX: 0, startY: 0, startTime: 0 });
+  const shareBlobRef = useRef<{ url: string; file: File } | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -165,6 +166,23 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
 
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
 
+  // Pre-fetch image blob when a photo is enlarged so share is instant
+  useEffect(() => {
+    const p = gridViewing || viewingPhoto;
+    if (!p) return;
+    if (shareBlobRef.current?.url === p.url) return;
+    shareBlobRef.current = null;
+    const fileName = `print-${p.idx + 1}.jpg`;
+    const proxyUrl = `${window.location.origin}/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
+    fetch(proxyUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+        shareBlobRef.current = { url: p.url, file };
+      })
+      .catch(() => {});
+  }, [gridViewing, viewingPhoto]);
+
   async function handleShare(e: React.MouseEvent, photo?: Photo) {
     e.stopPropagation();
     const p = photo || viewingPhoto;
@@ -172,14 +190,24 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     setShareAnim(true);
     setTimeout(() => setShareAnim(false), 600);
 
+    // Use pre-fetched blob if available (keeps iOS gesture chain intact)
+    const cached = shareBlobRef.current;
+    if (cached?.url === p.url && navigator.canShare?.({ files: [cached.file] })) {
+      try {
+        await navigator.share({ files: [cached.file] });
+        return;
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: fetch inline (may break iOS gesture chain but works on desktop)
     const fileName = `print-${p.idx + 1}.jpg`;
     const proxyUrl = `${window.location.origin}/api/share?url=${encodeURIComponent(p.url)}&name=${encodeURIComponent(fileName)}`;
-
     try {
       const res = await fetch(proxyUrl);
       const blob = await res.blob();
       const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
-
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file] });
         return;
@@ -188,7 +216,6 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
       if (err.name === 'AbortError') return;
     }
 
-    // Desktop/fallback: trigger download via proxy
     window.open(proxyUrl, '_blank');
   }
 
