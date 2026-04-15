@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { createSupabaseBrowser } from '@/lib/supabase-browser';
 
 interface Gallery {
   id: string;
@@ -69,7 +70,20 @@ export default function AdminPage() {
       `}</style>
 
       <div style={s.container}>
-        <h1 style={s.heading}>Galleries</h1>
+        <div style={s.headerRow}>
+          <h1 style={s.heading}>Galleries</h1>
+          <button
+            style={s.logoutBtn}
+            onClick={async () => {
+              const supabase = createSupabaseBrowser();
+              await supabase.auth.signOut();
+              router.push('/admin/login');
+              router.refresh();
+            }}
+          >
+            Log out
+          </button>
+        </div>
 
         {/* Create new */}
         <div style={s.createRow}>
@@ -141,8 +155,25 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: '28px',
     fontWeight: 400,
     color: '#3a3530',
-    marginBottom: '32px',
     letterSpacing: '1px',
+  },
+  headerRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '32px',
+  },
+  logoutBtn: {
+    padding: '6px 14px',
+    fontSize: '12px',
+    fontWeight: 400,
+    color: '#8a8078',
+    background: 'none',
+    border: '1px solid #d0ccc6',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+    letterSpacing: '0.5px',
   },
   createRow: {
     display: 'flex',
