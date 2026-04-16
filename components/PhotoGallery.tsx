@@ -396,7 +396,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
           {gridStyle === 'clean' ? (
             <div style={{
               ...st.cleanGrid,
-              ...(isMobile ? {} : { maxWidth: '1100px', gridTemplateColumns: 'repeat(4, 1fr)' }),
+              ...(isMobile ? {} : { maxWidth: 'none' }),
             }}>
               {photos.map((photo) => (
                 <div
@@ -413,7 +413,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
           ) : (
             <div style={{
               ...st.scatterContainer,
-              ...(isMobile ? {} : { maxWidth: '900px' }),
+              ...(isMobile ? {} : { maxWidth: 'none' }),
             }}>
               {photos.map((photo, i) => {
                 const rot = photo.stackRotation * 2.5;
