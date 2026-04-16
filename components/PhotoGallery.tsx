@@ -105,6 +105,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [dragging, setDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [desktopCols, setDesktopCols] = useState(5);
+  const [hoveredScatterId, setHoveredScatterId] = useState<string | null>(null);
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
   const [showHelper, setShowHelper] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -432,6 +433,8 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                 const offsetX = ((i % cols) - (cols - 1) / 2) * 14 + photo.stackX * 4;
                 const inFirstRow = i < cols;
                 const desktopOverlap = -(10 + desktopCols * 3);
+                const isHovered = !isMobile && hoveredScatterId === photo.id;
+                const hoverLift = isHovered ? ' translateY(-14px) scale(1.04)' : '';
                 return (
                   <div
                     key={photo.id}
@@ -444,13 +447,19 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                               ? `${200 / desktopCols}%`
                               : `${100 / desktopCols}%`,
                           }),
-                      zIndex: Math.min(i, 40),
-                      transform: `rotate(${rot}deg) translateX(${offsetX}px)`,
+                      zIndex: isHovered ? 100 : Math.min(i, 40),
+                      transform: `rotate(${rot}deg) translateX(${offsetX}px)${hoverLift}`,
                       marginTop: inFirstRow ? '0px' : (isMobile ? '-30px' : `${desktopOverlap}px`),
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                     }}
                     onClick={() => setGridViewing(photo)}
+                    onMouseEnter={!isMobile ? () => setHoveredScatterId(photo.id) : undefined}
+                    onMouseLeave={!isMobile ? () => setHoveredScatterId(null) : undefined}
                   >
-                    <div style={photo.isLandscape ? st.scatterPrintLandscape : st.scatterPrint}>
+                    <div style={{
+                      ...(photo.isLandscape ? st.scatterPrintLandscape : st.scatterPrint),
+                      ...(isHovered ? { boxShadow: '0 14px 40px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.12)' } : {}),
+                    }}>
                       <img src={photo.url} alt="" style={st.scatterImg} loading="lazy" />
                     </div>
                   </div>
