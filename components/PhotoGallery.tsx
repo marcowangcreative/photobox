@@ -104,6 +104,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [desktopCols, setDesktopCols] = useState(5);
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
   const [showHelper, setShowHelper] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -119,7 +120,13 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   }, []);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 1024);
+    const check = () => {
+      const w = window.innerWidth;
+      setIsMobile(w < 1024);
+      if (w >= 1800) setDesktopCols(7);
+      else if (w >= 1400) setDesktopCols(6);
+      else setDesktopCols(5);
+    };
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
@@ -396,7 +403,11 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
           {gridStyle === 'clean' ? (
             <div style={{
               ...st.cleanGrid,
-              ...(isMobile ? {} : { maxWidth: 'none' }),
+              ...(isMobile ? {} : {
+                maxWidth: 'none',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gridAutoFlow: 'dense',
+              }),
             }}>
               {photos.map((photo) => (
                 <div
@@ -417,16 +428,25 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             }}>
               {photos.map((photo, i) => {
                 const rot = photo.stackRotation * 2.5;
-                const offsetX = ((i % 3) - 1) * 18 + photo.stackX * 4;
+                const cols = isMobile ? 3 : desktopCols;
+                const offsetX = ((i % cols) - (cols - 1) / 2) * 14 + photo.stackX * 4;
+                const inFirstRow = i < cols;
+                const desktopOverlap = -(50 + desktopCols * 8);
                 return (
                   <div
                     key={photo.id}
                     style={{
                       ...(photo.isLandscape ? st.scatterItemLandscape : st.scatterItem),
-                      ...(isMobile ? {} : { width: photo.isLandscape ? '30%' : '22%' }),
+                      ...(isMobile
+                        ? {}
+                        : {
+                            width: photo.isLandscape
+                              ? `${200 / desktopCols}%`
+                              : `${100 / desktopCols}%`,
+                          }),
                       zIndex: Math.min(i, 40),
                       transform: `rotate(${rot}deg) translateX(${offsetX}px)`,
-                      marginTop: i < 3 ? '0px' : '-30px',
+                      marginTop: inFirstRow ? '0px' : (isMobile ? '-30px' : `${desktopOverlap}px`),
                     }}
                     onClick={() => setGridViewing(photo)}
                   >
