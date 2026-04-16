@@ -431,7 +431,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                 const cols = isMobile ? 3 : desktopCols;
                 const offsetX = ((i % cols) - (cols - 1) / 2) * 14 + photo.stackX * 4;
                 const inFirstRow = i < cols;
-                const desktopOverlap = -(50 + desktopCols * 8);
+                const desktopOverlap = -(20 + desktopCols * 5);
                 return (
                   <div
                     key={photo.id}
