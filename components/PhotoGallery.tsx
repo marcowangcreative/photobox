@@ -394,7 +394,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         </div>
         <div style={gridStyle === 'clean' ? st.cleanScroll : st.scatterScroll}>
           {gridStyle === 'clean' ? (
-            <div style={st.cleanGrid}>
+            <div style={{
+              ...st.cleanGrid,
+              ...(isMobile ? {} : { maxWidth: '1100px', gridTemplateColumns: 'repeat(4, 1fr)' }),
+            }}>
               {photos.map((photo) => (
                 <div
                   key={photo.id}
@@ -408,7 +411,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               ))}
             </div>
           ) : (
-            <div style={st.scatterContainer}>
+            <div style={{
+              ...st.scatterContainer,
+              ...(isMobile ? {} : { maxWidth: '900px' }),
+            }}>
               {photos.map((photo, i) => {
                 const rot = photo.stackRotation * 2.5;
                 const offsetX = ((i % 3) - 1) * 18 + photo.stackX * 4;
@@ -417,6 +423,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                     key={photo.id}
                     style={{
                       ...(photo.isLandscape ? st.scatterItemLandscape : st.scatterItem),
+                      ...(isMobile ? {} : { width: photo.isLandscape ? '30%' : '22%' }),
                       zIndex: Math.min(i, 40),
                       transform: `rotate(${rot}deg) translateX(${offsetX}px)`,
                       marginTop: i < 3 ? '0px' : '-30px',
