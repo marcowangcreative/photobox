@@ -1041,6 +1041,7 @@ const st: Record<string, React.CSSProperties> = {
   cleanGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
+    gridAutoFlow: 'dense',
     gap: '3px',
     maxWidth: '540px',
     margin: '0 auto',
