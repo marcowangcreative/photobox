@@ -1083,8 +1083,9 @@ const st: Record<string, React.CSSProperties> = {
   viewPrint: {
     background: '#f5f0e8',
     padding: '12px',
-    width: 'min(90vw, 720px)',
-    height: 'min(88vh, 1050px)',
+    height: 'min(90vh, 1050px)',
+    aspectRatio: '2/3',
+    maxWidth: '90vw',
     boxShadow: '0 12px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(0,0,0,0.1)',
     transform: 'rotate(-0.3deg)',
     display: 'flex',
@@ -1092,8 +1093,9 @@ const st: Record<string, React.CSSProperties> = {
   viewPrintLandscape: {
     background: '#f5f0e8',
     padding: '12px',
-    width: 'min(92vw, 1050px)',
-    height: 'min(80vh, 720px)',
+    height: 'min(85vh, 720px)',
+    aspectRatio: '3/2',
+    maxWidth: '92vw',
     boxShadow: '0 12px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(0,0,0,0.1)',
     transform: 'rotate(-0.3deg)',
     display: 'flex',
