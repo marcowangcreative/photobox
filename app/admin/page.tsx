@@ -119,6 +119,14 @@ export default function AdminPage() {
                   >
                     {g.is_published ? 'Live' : 'Draft'}
                   </button>
+                  <a
+                    style={{ ...s.btnSmall, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                    href={`/g/${g.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open
+                  </a>
                   <button
                     style={s.btnSmall}
                     onClick={() => router.push(`/admin/${g.id}`)}
