@@ -643,7 +643,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             style={{
               ...(fullscreen ? { ...st.overlay, ...st.overlayFullscreen } : st.overlay),
               animation: phase === 'discarding'
-                ? (direction === 'forward' ? 'discardLeft 0.32s ease-in forwards' : 'discardRight 0.32s ease-in forwards')
+                ? 'fadeOut 0.28s ease forwards'
                 : phase === 'pulling' ? 'fadeIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) forwards' : undefined,
             }}
             onClick={phase === 'viewing' && !dragging ? () => { dismissPhoto(); setFullscreen(false); } : undefined}
@@ -663,7 +663,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               ...(viewingPhoto.isLandscape
                 ? (isMobile ? st.viewPrintLandscapeMobile : st.viewPrintLandscape)
                 : st.viewPrint),
-              animation: phase === 'viewing' && !dragging ? 'breathe 3.5s ease-in-out infinite' : 'none',
+              animation: phase === 'discarding'
+                ? (direction === 'forward' ? 'discardLeft 0.32s ease-in forwards' : 'discardRight 0.32s ease-in forwards')
+                : phase === 'viewing' && !dragging ? 'breathe 3.5s ease-in-out infinite' : 'none',
               transform: dragging && phase === 'viewing'
                 ? `translate(${dragX}px, ${Math.abs(dragX) * 0.15}px) rotate(${dragX * 0.04}deg)`
                 : pinchScale > 1
