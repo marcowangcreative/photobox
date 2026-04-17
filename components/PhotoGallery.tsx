@@ -17,7 +17,7 @@ interface Props {
   gridStyle?: 'stacked' | 'clean';
 }
 
-function GridIcon({ color = '#c9bfae' }: { color?: string }) {
+function GridIcon({ color = 'var(--text-accent)' }: { color?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill={color}>
       <rect x="0" y="0" width="5" height="5" rx="1" />
@@ -33,7 +33,7 @@ function GridIcon({ color = '#c9bfae' }: { color?: string }) {
   );
 }
 
-function StackIcon({ color = '#c9bfae' }: { color?: string }) {
+function StackIcon({ color = 'var(--text-accent)' }: { color?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke={color} strokeWidth="1.2">
       <rect x="2" y="1" width="14" height="10" rx="1" fill={color} fillOpacity="0.15" />
@@ -45,7 +45,7 @@ function StackIcon({ color = '#c9bfae' }: { color?: string }) {
 
 function SendIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9bfae" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="22" y1="2" x2="11" y2="13" />
       <polygon points="22 2 15 22 11 13 2 9 22 2" />
     </svg>
@@ -54,7 +54,7 @@ function SendIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9bc49f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -62,7 +62,7 @@ function CheckIcon() {
 
 function ExpandIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9bfae" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="15 3 21 3 21 9" />
       <polyline points="9 21 3 21 3 15" />
       <line x1="21" y1="3" x2="14" y2="10" />
@@ -353,17 +353,17 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     return (
       <div style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: '#15120f',
+        background: 'var(--bg)',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         fontFamily: 'DM Sans, sans-serif',
-        color: '#c9bfae',
+        color: 'var(--text-accent)',
         padding: '40px',
         textAlign: 'center',
         animation: 'fadeInSimple 0.4s ease',
       }} onClick={() => { localStorage.setItem('orientationHelperDismissed', '1'); setShowHelper(false); }}>
         <style>{baseStyles}</style>
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9bfae" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '24px' }}>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-accent)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '24px' }}>
           <rect x="5" y="2" width="14" height="20" rx="2" />
           <line x1="12" y1="18" x2="12" y2="18.01" strokeWidth="2" />
           <rect x="9.5" y="8" width="5" height="4" rx="1" />
@@ -372,7 +372,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         <div style={{
           fontFamily: 'Playfair Display, serif',
           fontSize: '22px', fontWeight: 600,
-          marginBottom: '12px', color: '#ece3d1',
+          marginBottom: '12px', color: 'var(--text)',
         }}>Lock your orientation</div>
         <div style={{ fontSize: '14px', lineHeight: 1.6, opacity: 0.7, maxWidth: '260px' }}>
           For the best experience, lock your phone to portrait mode before viewing.
@@ -751,10 +751,10 @@ const st: Record<string, React.CSSProperties> = {
     width: '100vw',
     height: '100vh',
     background:
-      'radial-gradient(ellipse at 25% 40%, rgba(90,78,62,0.3) 0%, transparent 55%),' +
-      'radial-gradient(ellipse at 75% 25%, rgba(70,60,48,0.28) 0%, transparent 50%),' +
-      'radial-gradient(ellipse at 55% 75%, rgba(50,42,34,0.25) 0%, transparent 55%),' +
-      'linear-gradient(160deg, #1a1613 0%, #1e1a15 30%, #181410 60%, #1c1814 100%)',
+      'radial-gradient(ellipse at 25% 40%, var(--bg-scene-1) 0%, transparent 55%),' +
+      'radial-gradient(ellipse at 75% 25%, var(--bg-scene-2) 0%, transparent 50%),' +
+      'radial-gradient(ellipse at 55% 75%, var(--bg-scene-3) 0%, transparent 55%),' +
+      'linear-gradient(160deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 30%, var(--bg-grad-3) 60%, var(--bg-grad-4) 100%)',
     overflow: 'hidden',
     fontFamily: "'DM Sans', sans-serif",
     display: 'flex',
@@ -772,7 +772,7 @@ const st: Record<string, React.CSSProperties> = {
     fontSize: '22px',
     fontWeight: 400,
     fontStyle: 'italic',
-    color: '#ece3d1',
+    color: 'var(--text)',
     letterSpacing: '2px',
     marginBottom: '4px',
   },
@@ -798,9 +798,9 @@ const st: Record<string, React.CSSProperties> = {
     top: 0, left: 0,
     width: '80px',
     height: '120px',
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '4px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)',
+    boxShadow: 'var(--shadow-sm)',
     display: 'flex',
     overflow: 'hidden',
   },
@@ -809,9 +809,9 @@ const st: Record<string, React.CSSProperties> = {
     top: '20px', left: '-20px',
     width: '120px',
     height: '80px',
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '4px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)',
+    boxShadow: 'var(--shadow-sm)',
     display: 'flex',
     overflow: 'hidden',
   },
@@ -830,7 +830,7 @@ const st: Record<string, React.CSSProperties> = {
     width: '200px',
     height: '280px',
     borderRadius: '1px',
-    background: '#2a241e',
+    background: 'var(--tray-outer)',
     boxShadow:
       'inset 0 0 0 1px rgba(255,255,255,0.05),' +
       '0 1px 2px rgba(0,0,0,0.5),' +
@@ -844,7 +844,7 @@ const st: Record<string, React.CSSProperties> = {
     borderRadius: '0px',
     background:
       'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 60%, transparent 100%),' +
-      'linear-gradient(180deg, #1a1510 0%, #1f1a14 30%, #221c16 70%, #1a1510 100%)',
+      'linear-gradient(180deg, var(--tray-grad-1) 0%, var(--tray-grad-2) 30%, var(--tray-grad-3) 70%, var(--tray-grad-1) 100%)',
     boxShadow:
       'inset 0 2px 6px rgba(0,0,0,0.6),' +
       'inset 0 -1px 3px rgba(0,0,0,0.4),' +
@@ -864,7 +864,7 @@ const st: Record<string, React.CSSProperties> = {
     width: 'min(80vw, 340px)',
     aspectRatio: '2/3',
     zIndex: 30,
-    background: '#2a241e',
+    background: 'var(--lid-bg)',
     borderRadius: '1px',
     boxShadow:
       '0 4px 20px rgba(0,0,0,0.5),' +
@@ -879,7 +879,7 @@ const st: Record<string, React.CSSProperties> = {
     position: 'absolute',
     inset: '-2px',
     zIndex: 30,
-    background: '#2a241e',
+    background: 'var(--lid-bg)',
     borderRadius: '1px',
     boxShadow:
       '0 2px 8px rgba(0,0,0,0.5),' +
@@ -897,7 +897,7 @@ const st: Record<string, React.CSSProperties> = {
     fontFamily: "'DM Sans', sans-serif",
     fontSize: '18px',
     fontWeight: 400,
-    color: '#ece3d1',
+    color: 'var(--text)',
     letterSpacing: '3px',
     textTransform: 'uppercase',
     marginBottom: '0px',
@@ -907,7 +907,7 @@ const st: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     fontWeight: 400,
     fontStyle: 'italic',
-    color: '#a0958a',
+    color: 'var(--text-muted)',
     letterSpacing: '1px',
   },
   stackContainer: {
@@ -924,8 +924,8 @@ const st: Record<string, React.CSSProperties> = {
   stackedPrintInner: {
     width: '100%',
     height: '100%',
-    background: '#e8ddc8',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+    background: 'var(--print-bg-2)',
+    boxShadow: 'var(--shadow-stacked)',
   },
   topPrint: {
     position: 'absolute',
@@ -943,9 +943,9 @@ const st: Record<string, React.CSSProperties> = {
   topPrintBorder: {
     width: '100%',
     height: '100%',
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '6px',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)',
+    boxShadow: 'var(--shadow-md)',
     display: 'flex',
     overflow: 'hidden',
   },
@@ -954,7 +954,7 @@ const st: Record<string, React.CSSProperties> = {
     height: '100%',
     objectFit: 'cover',
     display: 'block',
-    filter: 'brightness(0.92)',
+    filter: 'brightness(var(--print-img-brightness))',
   },
   doneState: {
     display: 'flex',
@@ -966,7 +966,7 @@ const st: Record<string, React.CSSProperties> = {
   },
   doneAction: {
     fontSize: '11px',
-    color: '#c9bfae',
+    color: 'var(--text-accent)',
     letterSpacing: '3px',
     textTransform: 'uppercase',
     fontWeight: 300,
@@ -1010,18 +1010,18 @@ const st: Record<string, React.CSSProperties> = {
   scatterPrint: {
     width: '100%',
     aspectRatio: '2/3',
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '5px',
     display: 'flex',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)',
+    boxShadow: 'var(--shadow-md)',
   },
   scatterPrintLandscape: {
     width: '100%',
     aspectRatio: '3/2',
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '5px',
     display: 'flex',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06)',
+    boxShadow: 'var(--shadow-md)',
   },
   scatterImg: {
     width: '100%',
@@ -1073,8 +1073,8 @@ const st: Record<string, React.CSSProperties> = {
     width: '44px',
     height: '44px',
     borderRadius: '50%',
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--toggle-bg)',
+    border: '1px solid var(--toggle-border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1088,8 +1088,8 @@ const st: Record<string, React.CSSProperties> = {
     width: '44px',
     height: '44px',
     borderRadius: '50%',
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--toggle-bg)',
+    border: '1px solid var(--toggle-border)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1103,7 +1103,7 @@ const st: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(15, 12, 10, 0.72)',
+    background: 'var(--overlay-bg)',
     zIndex: 50,
     cursor: 'pointer',
     backdropFilter: 'blur(6px)',
@@ -1111,31 +1111,31 @@ const st: Record<string, React.CSSProperties> = {
     padding: '16px',
   },
   viewPrint: {
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '12px',
     height: 'min(90vh, 1050px)',
     aspectRatio: '2/3',
     maxWidth: '90vw',
-    boxShadow: '0 12px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(0,0,0,0.1)',
+    boxShadow: 'var(--shadow-lg)',
     transform: 'rotate(-0.3deg)',
     display: 'flex',
   },
   viewPrintLandscape: {
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '12px',
     height: 'min(85vh, 720px)',
     aspectRatio: '3/2',
     maxWidth: '92vw',
-    boxShadow: '0 12px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(0,0,0,0.1)',
+    boxShadow: 'var(--shadow-lg)',
     transform: 'rotate(-0.3deg)',
     display: 'flex',
   },
   viewPrintLandscapeMobile: {
-    background: '#f5f0e8',
+    background: 'var(--print-bg)',
     padding: '12px',
     width: 'min(80vh, 800px)',
     height: 'min(90vw, 540px)',
-    boxShadow: '0 12px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(0,0,0,0.1)',
+    boxShadow: 'var(--shadow-lg)',
     display: 'flex',
   },
   viewImg: {
@@ -1149,7 +1149,7 @@ const st: Record<string, React.CSSProperties> = {
     bottom: '18px',
     right: '22px',
     fontSize: '12px',
-    color: 'rgba(236, 227, 209, 0.7)',
+    color: 'var(--photo-num)',
     letterSpacing: '2px',
     fontWeight: 300,
     zIndex: 55,
@@ -1159,13 +1159,13 @@ const st: Record<string, React.CSSProperties> = {
     bottom: '18px',
     right: '22px',
     fontSize: '12px',
-    color: 'rgba(255,255,255,0.5)',
+    color: 'var(--photo-num-fullscreen)',
     letterSpacing: '2px',
     fontWeight: 300,
     zIndex: 55,
   },
   overlayFullscreen: {
-    background: 'rgba(0, 0, 0, 0.92)',
+    background: 'var(--overlay-fullscreen)',
     backdropFilter: 'none',
     WebkitBackdropFilter: 'none',
   },
@@ -1183,7 +1183,7 @@ const st: Record<string, React.CSSProperties> = {
     width: '36px',
     height: '36px',
     borderRadius: '50%',
-    background: 'rgba(255, 255, 255, 0.1)',
+    background: 'var(--toggle-bg-strong)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1198,7 +1198,7 @@ const st: Record<string, React.CSSProperties> = {
     width: '36px',
     height: '36px',
     borderRadius: '50%',
-    background: 'rgba(255, 255, 255, 0.12)',
+    background: 'var(--toggle-bg-stronger)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

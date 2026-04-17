@@ -66,7 +66,7 @@ export default function AdminPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #15120f; }
+        body { background: var(--bg); }
       `}</style>
 
       <div style={s.container}>
@@ -114,7 +114,7 @@ export default function AdminPage() {
                 </div>
                 <div style={s.cardActions}>
                   <button
-                    style={{ ...s.btnSmall, background: g.is_published ? '#5a8a5e' : '#8a7d6e' }}
+                    style={{ ...s.btnSmall, background: g.is_published ? 'var(--success-strong)' : 'var(--text-subtle-2)', color: '#fff' }}
                     onClick={() => togglePublish(g)}
                   >
                     {g.is_published ? 'Live' : 'Draft'}
@@ -126,7 +126,7 @@ export default function AdminPage() {
                     Edit
                   </button>
                   <button
-                    style={{ ...s.btnSmall, background: '#8a5a5a' }}
+                    style={{ ...s.btnSmall, background: 'var(--danger-strong)', color: '#fff' }}
                     onClick={() => deleteGallery(g.id)}
                   >
                     Delete
@@ -146,7 +146,7 @@ const s: Record<string, React.CSSProperties> = {
     minHeight: '100vh',
     fontFamily: "'DM Sans', sans-serif",
     padding: '40px 20px',
-    color: '#e8e1d4',
+    color: 'var(--text-2)',
   },
   container: {
     maxWidth: '640px',
@@ -155,7 +155,7 @@ const s: Record<string, React.CSSProperties> = {
   heading: {
     fontSize: '28px',
     fontWeight: 400,
-    color: '#ece3d1',
+    color: 'var(--text)',
     letterSpacing: '1px',
   },
   headerRow: {
@@ -168,9 +168,9 @@ const s: Record<string, React.CSSProperties> = {
     padding: '6px 14px',
     fontSize: '12px',
     fontWeight: 400,
-    color: '#a0958a',
+    color: 'var(--text-muted)',
     background: 'none',
-    border: '1px solid #3a342d',
+    border: '1px solid var(--border)',
     borderRadius: '4px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
@@ -185,10 +185,10 @@ const s: Record<string, React.CSSProperties> = {
     flex: 1,
     padding: '12px 16px',
     fontSize: '15px',
-    border: '1px solid #3a342d',
+    border: '1px solid var(--border)',
     borderRadius: '4px',
-    background: '#1e1a15',
-    color: '#ece3d1',
+    background: 'var(--surface)',
+    color: 'var(--text)',
     fontFamily: "'DM Sans', sans-serif",
     outline: 'none',
   },
@@ -196,8 +196,8 @@ const s: Record<string, React.CSSProperties> = {
     padding: '12px 24px',
     fontSize: '14px',
     fontWeight: 500,
-    color: '#1a1613',
-    background: '#ece3d1',
+    color: 'var(--accent-fg)',
+    background: 'var(--accent)',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
@@ -214,20 +214,20 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    background: '#1e1a15',
-    border: '1px solid #2a241e',
+    background: 'var(--surface)',
+    border: '1px solid var(--border-soft)',
     borderRadius: '6px',
   },
   cardMain: {},
   cardTitle: {
     fontSize: '17px',
     fontWeight: 400,
-    color: '#ece3d1',
+    color: 'var(--text)',
     marginBottom: '4px',
   },
   cardMeta: {
     fontSize: '13px',
-    color: '#a0958a',
+    color: 'var(--text-muted)',
   },
   cardActions: {
     display: 'flex',
@@ -237,8 +237,8 @@ const s: Record<string, React.CSSProperties> = {
     padding: '6px 14px',
     fontSize: '12px',
     fontWeight: 500,
-    color: '#ece3d1',
-    background: '#3a342d',
+    color: 'var(--text)',
+    background: 'var(--surface-elevated)',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
@@ -246,7 +246,7 @@ const s: Record<string, React.CSSProperties> = {
     letterSpacing: '0.5px',
   },
   empty: {
-    color: '#a0958a',
+    color: 'var(--text-muted)',
     fontSize: '14px',
   },
 };
