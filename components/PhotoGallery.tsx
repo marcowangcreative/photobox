@@ -17,7 +17,7 @@ interface Props {
   gridStyle?: 'stacked' | 'clean';
 }
 
-function GridIcon({ color = '#6b6159' }: { color?: string }) {
+function GridIcon({ color = '#c9bfae' }: { color?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill={color}>
       <rect x="0" y="0" width="5" height="5" rx="1" />
@@ -33,7 +33,7 @@ function GridIcon({ color = '#6b6159' }: { color?: string }) {
   );
 }
 
-function StackIcon({ color = '#6b6159' }: { color?: string }) {
+function StackIcon({ color = '#c9bfae' }: { color?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke={color} strokeWidth="1.2">
       <rect x="2" y="1" width="14" height="10" rx="1" fill={color} fillOpacity="0.15" />
@@ -45,7 +45,7 @@ function StackIcon({ color = '#6b6159' }: { color?: string }) {
 
 function SendIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b6159" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9bfae" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="22" y1="2" x2="11" y2="13" />
       <polygon points="22 2 15 22 11 13 2 9 22 2" />
     </svg>
@@ -54,7 +54,7 @@ function SendIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5a8a5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9bc49f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -62,7 +62,7 @@ function CheckIcon() {
 
 function ExpandIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8078" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c9bfae" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="15 3 21 3 21 9" />
       <polyline points="9 21 3 21 3 15" />
       <line x1="21" y1="3" x2="14" y2="10" />
@@ -353,17 +353,17 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     return (
       <div style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: '#faf8f4',
+        background: '#15120f',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         fontFamily: 'DM Sans, sans-serif',
-        color: '#6b6159',
+        color: '#c9bfae',
         padding: '40px',
         textAlign: 'center',
         animation: 'fadeInSimple 0.4s ease',
       }} onClick={() => { localStorage.setItem('orientationHelperDismissed', '1'); setShowHelper(false); }}>
         <style>{baseStyles}</style>
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b6159" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '24px' }}>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9bfae" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '24px' }}>
           <rect x="5" y="2" width="14" height="20" rx="2" />
           <line x1="12" y1="18" x2="12" y2="18.01" strokeWidth="2" />
           <rect x="9.5" y="8" width="5" height="4" rx="1" />
@@ -372,7 +372,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         <div style={{
           fontFamily: 'Playfair Display, serif',
           fontSize: '22px', fontWeight: 600,
-          marginBottom: '12px', color: '#3d3630',
+          marginBottom: '12px', color: '#ece3d1',
         }}>Lock your orientation</div>
         <div style={{ fontSize: '14px', lineHeight: 1.6, opacity: 0.7, maxWidth: '260px' }}>
           For the best experience, lock your phone to portrait mode before viewing.
@@ -751,10 +751,10 @@ const st: Record<string, React.CSSProperties> = {
     width: '100vw',
     height: '100vh',
     background:
-      'radial-gradient(ellipse at 25% 40%, rgba(200,194,186,0.25) 0%, transparent 50%),' +
-      'radial-gradient(ellipse at 75% 25%, rgba(188,183,175,0.2) 0%, transparent 45%),' +
-      'radial-gradient(ellipse at 55% 75%, rgba(195,190,182,0.15) 0%, transparent 50%),' +
-      'linear-gradient(160deg, #e8e4de 0%, #dfdbd4 30%, #e3dfd9 55%, #dad5ce 80%, #e1ddd7 100%)',
+      'radial-gradient(ellipse at 25% 40%, rgba(90,78,62,0.3) 0%, transparent 55%),' +
+      'radial-gradient(ellipse at 75% 25%, rgba(70,60,48,0.28) 0%, transparent 50%),' +
+      'radial-gradient(ellipse at 55% 75%, rgba(50,42,34,0.25) 0%, transparent 55%),' +
+      'linear-gradient(160deg, #1a1613 0%, #1e1a15 30%, #181410 60%, #1c1814 100%)',
     overflow: 'hidden',
     fontFamily: "'DM Sans', sans-serif",
     display: 'flex',
@@ -772,7 +772,7 @@ const st: Record<string, React.CSSProperties> = {
     fontSize: '22px',
     fontWeight: 400,
     fontStyle: 'italic',
-    color: '#5a4f42',
+    color: '#ece3d1',
     letterSpacing: '2px',
     marginBottom: '4px',
   },
@@ -830,12 +830,12 @@ const st: Record<string, React.CSSProperties> = {
     width: '200px',
     height: '280px',
     borderRadius: '1px',
-    background: '#e2ded8',
+    background: '#2a241e',
     boxShadow:
-      'inset 0 0 0 1px rgba(255,255,255,0.5),' +
-      '0 1px 2px rgba(0,0,0,0.08),' +
-      '0 4px 12px rgba(0,0,0,0.06),' +
-      '0 8px 24px rgba(0,0,0,0.04)',
+      'inset 0 0 0 1px rgba(255,255,255,0.05),' +
+      '0 1px 2px rgba(0,0,0,0.5),' +
+      '0 4px 12px rgba(0,0,0,0.4),' +
+      '0 8px 24px rgba(0,0,0,0.3)',
     padding: '5px',
   },
   trayInner: {
@@ -843,13 +843,13 @@ const st: Record<string, React.CSSProperties> = {
     height: '100%',
     borderRadius: '0px',
     background:
-      'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.03) 60%, transparent 100%),' +
-      'linear-gradient(180deg, #b5b0a8 0%, #bfbab2 30%, #c2bdb5 70%, #b8b3ab 100%)',
+      'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 60%, transparent 100%),' +
+      'linear-gradient(180deg, #1a1510 0%, #1f1a14 30%, #221c16 70%, #1a1510 100%)',
     boxShadow:
-      'inset 0 2px 6px rgba(0,0,0,0.12),' +
-      'inset 0 -1px 3px rgba(0,0,0,0.06),' +
-      'inset 2px 0 4px rgba(0,0,0,0.05),' +
-      'inset -2px 0 4px rgba(0,0,0,0.05)',
+      'inset 0 2px 6px rgba(0,0,0,0.6),' +
+      'inset 0 -1px 3px rgba(0,0,0,0.4),' +
+      'inset 2px 0 4px rgba(0,0,0,0.3),' +
+      'inset -2px 0 4px rgba(0,0,0,0.3)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -864,12 +864,12 @@ const st: Record<string, React.CSSProperties> = {
     width: 'min(80vw, 340px)',
     aspectRatio: '2/3',
     zIndex: 30,
-    background: '#e8e4de',
+    background: '#2a241e',
     borderRadius: '1px',
     boxShadow:
-      '0 4px 20px rgba(0,0,0,0.1),' +
-      '0 12px 40px rgba(0,0,0,0.06),' +
-      'inset 0 1px 0 rgba(255,255,255,0.6)',
+      '0 4px 20px rgba(0,0,0,0.5),' +
+      '0 12px 40px rgba(0,0,0,0.4),' +
+      'inset 0 1px 0 rgba(255,255,255,0.05)',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -879,11 +879,11 @@ const st: Record<string, React.CSSProperties> = {
     position: 'absolute',
     inset: '-2px',
     zIndex: 30,
-    background: '#e8e4de',
+    background: '#2a241e',
     borderRadius: '1px',
     boxShadow:
-      '0 2px 8px rgba(0,0,0,0.1),' +
-      'inset 0 1px 0 rgba(255,255,255,0.6)',
+      '0 2px 8px rgba(0,0,0,0.5),' +
+      'inset 0 1px 0 rgba(255,255,255,0.05)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -897,7 +897,7 @@ const st: Record<string, React.CSSProperties> = {
     fontFamily: "'DM Sans', sans-serif",
     fontSize: '18px',
     fontWeight: 400,
-    color: '#5a5248',
+    color: '#ece3d1',
     letterSpacing: '3px',
     textTransform: 'uppercase',
     marginBottom: '0px',
@@ -907,7 +907,7 @@ const st: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     fontWeight: 400,
     fontStyle: 'italic',
-    color: '#8a8078',
+    color: '#a0958a',
     letterSpacing: '1px',
   },
   stackContainer: {
@@ -924,8 +924,8 @@ const st: Record<string, React.CSSProperties> = {
   stackedPrintInner: {
     width: '100%',
     height: '100%',
-    background: '#ede8e0',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    background: '#e8ddc8',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
   },
   topPrint: {
     position: 'absolute',
@@ -966,7 +966,7 @@ const st: Record<string, React.CSSProperties> = {
   },
   doneAction: {
     fontSize: '11px',
-    color: '#6b6159',
+    color: '#c9bfae',
     letterSpacing: '3px',
     textTransform: 'uppercase',
     fontWeight: 300,
@@ -1073,8 +1073,8 @@ const st: Record<string, React.CSSProperties> = {
     width: '44px',
     height: '44px',
     borderRadius: '50%',
-    background: 'rgba(0,0,0,0.04)',
-    border: '1px solid rgba(0,0,0,0.08)',
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1088,8 +1088,8 @@ const st: Record<string, React.CSSProperties> = {
     width: '44px',
     height: '44px',
     borderRadius: '50%',
-    background: 'rgba(0,0,0,0.04)',
-    border: '1px solid rgba(0,0,0,0.08)',
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1103,11 +1103,11 @@ const st: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(225, 221, 215, 0.15)',
+    background: 'rgba(15, 12, 10, 0.72)',
     zIndex: 50,
     cursor: 'pointer',
-    backdropFilter: 'blur(3px)',
-    WebkitBackdropFilter: 'blur(3px)',
+    backdropFilter: 'blur(6px)',
+    WebkitBackdropFilter: 'blur(6px)',
     padding: '16px',
   },
   viewPrint: {
@@ -1149,7 +1149,7 @@ const st: Record<string, React.CSSProperties> = {
     bottom: '18px',
     right: '22px',
     fontSize: '12px',
-    color: '#8a8078',
+    color: 'rgba(236, 227, 209, 0.7)',
     letterSpacing: '2px',
     fontWeight: 300,
     zIndex: 55,
@@ -1183,7 +1183,7 @@ const st: Record<string, React.CSSProperties> = {
     width: '36px',
     height: '36px',
     borderRadius: '50%',
-    background: 'rgba(225, 221, 215, 0.6)',
+    background: 'rgba(255, 255, 255, 0.1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

@@ -181,7 +181,7 @@ export default function GalleryEditor() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #f5f3f0; }
+        body { background: #15120f; }
       `}</style>
 
       <div style={s.container}>
@@ -205,7 +205,7 @@ export default function GalleryEditor() {
                 />
                 <label style={{ ...s.label, marginTop: '12px' }}>URL Slug</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ ...s.label, marginTop: 0, color: '#8a8078' }}>/g/</span>
+                  <span style={{ ...s.label, marginTop: 0, color: '#a0958a' }}>/g/</span>
                   <input
                     style={s.input}
                     value={gallery.slug}
@@ -239,7 +239,12 @@ export default function GalleryEditor() {
                   </a>
                 </div>
                 <button
-                  style={{ ...s.btn, background: gallery.is_published ? '#5a8a5e' : '#5a5248', width: '100%' }}
+                  style={{
+                    ...s.btn,
+                    background: gallery.is_published ? '#9bc49f' : '#ece3d1',
+                    color: '#1a1613',
+                    width: '100%',
+                  }}
                   onClick={() => updateGallery({ is_published: !gallery.is_published })}
                 >
                   {gallery.is_published ? '● Live' : 'Publish'}
@@ -255,8 +260,8 @@ export default function GalleryEditor() {
             <div
               style={{
                 ...s.dropZone,
-                borderColor: dragOver ? '#5a5248' : '#ccc8c2',
-                background: dragOver ? 'rgba(90,82,72,0.04)' : 'transparent',
+                borderColor: dragOver ? '#ece3d1' : '#3a342d',
+                background: dragOver ? 'rgba(236,227,209,0.04)' : 'transparent',
               }}
               onDragOver={e => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
@@ -331,7 +336,7 @@ export default function GalleryEditor() {
                       style={{
                         ...s.photoCard,
                         opacity: dragIdx === idx ? 0.4 : 1,
-                        outline: dropIdx === idx ? '2px solid #5a5248' : 'none',
+                        outline: dropIdx === idx ? '2px solid #ece3d1' : 'none',
                         cursor: sortMode === 'custom' ? 'grab' : 'default',
                       }}
                       draggable={sortMode === 'custom'}
@@ -369,6 +374,7 @@ const s: Record<string, React.CSSProperties> = {
     minHeight: '100vh',
     fontFamily: "'DM Sans', sans-serif",
     padding: '40px 20px 100px',
+    color: '#e8e1d4',
   },
   container: {
     maxWidth: '780px',
@@ -378,7 +384,7 @@ const s: Record<string, React.CSSProperties> = {
     background: 'none',
     border: 'none',
     fontSize: '14px',
-    color: '#8a7d6e',
+    color: '#a0958a',
     cursor: 'pointer',
     marginBottom: '24px',
     fontFamily: "'DM Sans', sans-serif",
@@ -400,7 +406,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'block',
     fontSize: '11px',
     fontWeight: 500,
-    color: '#8a7d6e',
+    color: '#a0958a',
     letterSpacing: '1px',
     textTransform: 'uppercase' as const,
     marginBottom: '4px',
@@ -409,29 +415,30 @@ const s: Record<string, React.CSSProperties> = {
     width: '100%',
     padding: '10px 14px',
     fontSize: '15px',
-    border: '1px solid #d0ccc6',
+    border: '1px solid #3a342d',
     borderRadius: '4px',
-    background: '#fff',
+    background: '#1e1a15',
+    color: '#ece3d1',
     fontFamily: "'DM Sans', sans-serif",
     outline: 'none',
   },
   linkBox: {
     padding: '10px 12px',
-    background: '#fff',
-    border: '1px solid #e8e4de',
+    background: '#1e1a15',
+    border: '1px solid #2a241e',
     borderRadius: '4px',
   },
   linkLabel: {
     display: 'block',
     fontSize: '10px',
-    color: '#8a8078',
+    color: '#a0958a',
     letterSpacing: '0.5px',
     textTransform: 'uppercase' as const,
     marginBottom: '4px',
   },
   link: {
     fontSize: '13px',
-    color: '#5a5248',
+    color: '#ece3d1',
     textDecoration: 'none',
     wordBreak: 'break-all' as const,
   },
@@ -439,8 +446,8 @@ const s: Record<string, React.CSSProperties> = {
     padding: '10px 16px',
     fontSize: '13px',
     fontWeight: 500,
-    color: '#fff',
-    background: '#5a5248',
+    color: '#1a1613',
+    background: '#ece3d1',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
@@ -449,24 +456,24 @@ const s: Record<string, React.CSSProperties> = {
   btnSmall: {
     padding: '6px 14px',
     fontSize: '12px',
-    color: '#5a5248',
+    color: '#ece3d1',
     background: 'transparent',
-    border: '1px solid #ccc8c2',
+    border: '1px solid #3a342d',
     borderRadius: '4px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
   },
   photoCount: {
     fontSize: '13px',
-    color: '#8a8078',
+    color: '#a0958a',
     textAlign: 'center' as const,
   },
   savingBadge: {
-    color: '#5a8a5e',
+    color: '#9bc49f',
     fontSize: '11px',
   },
   dropZone: {
-    border: '2px dashed #ccc8c2',
+    border: '2px dashed #3a342d',
     borderRadius: '6px',
     padding: '36px 24px',
     textAlign: 'center' as const,
@@ -476,36 +483,36 @@ const s: Record<string, React.CSSProperties> = {
   },
   dropText: {
     fontSize: '14px',
-    color: '#5a5248',
+    color: '#ece3d1',
     marginBottom: '8px',
   },
   dropSub: {
     fontSize: '12px',
-    color: '#8a8078',
+    color: '#a0958a',
   },
   progressBar: {
     width: '100%',
     maxWidth: '300px',
     height: '4px',
-    background: '#e2ded8',
+    background: '#2a241e',
     borderRadius: '2px',
     margin: '0 auto',
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    background: '#5a5248',
+    background: '#ece3d1',
     borderRadius: '2px',
     transition: 'width 0.3s ease',
   },
   failedText: {
     fontSize: '12px',
-    color: '#8a5a5a',
+    color: '#e88',
     marginTop: '8px',
   },
   reorderHint: {
     fontSize: '12px',
-    color: '#8a8078',
+    color: '#a0958a',
     marginBottom: '12px',
   },
   sortBar: {
@@ -518,7 +525,7 @@ const s: Record<string, React.CSSProperties> = {
   sortLabel: {
     fontSize: '11px',
     fontWeight: 500,
-    color: '#8a7d6e',
+    color: '#a0958a',
     letterSpacing: '1px',
     textTransform: 'uppercase' as const,
   },
@@ -530,18 +537,18 @@ const s: Record<string, React.CSSProperties> = {
   sortBtn: {
     padding: '5px 12px',
     fontSize: '12px',
-    color: '#8a7d6e',
-    background: '#fff',
-    border: '1px solid #d0ccc6',
+    color: '#a0958a',
+    background: '#1e1a15',
+    border: '1px solid #3a342d',
     borderRadius: '20px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
     transition: 'all 0.15s ease',
   },
   sortBtnActive: {
-    color: '#fff',
-    background: '#5a5248',
-    borderColor: '#5a5248',
+    color: '#1a1613',
+    background: '#ece3d1',
+    borderColor: '#ece3d1',
   },
   photoGrid: {
     display: 'grid',

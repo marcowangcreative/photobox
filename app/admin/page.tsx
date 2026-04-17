@@ -66,7 +66,7 @@ export default function AdminPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #f5f3f0; }
+        body { background: #15120f; }
       `}</style>
 
       <div style={s.container}>
@@ -146,6 +146,7 @@ const s: Record<string, React.CSSProperties> = {
     minHeight: '100vh',
     fontFamily: "'DM Sans', sans-serif",
     padding: '40px 20px',
+    color: '#e8e1d4',
   },
   container: {
     maxWidth: '640px',
@@ -154,7 +155,7 @@ const s: Record<string, React.CSSProperties> = {
   heading: {
     fontSize: '28px',
     fontWeight: 400,
-    color: '#3a3530',
+    color: '#ece3d1',
     letterSpacing: '1px',
   },
   headerRow: {
@@ -167,9 +168,9 @@ const s: Record<string, React.CSSProperties> = {
     padding: '6px 14px',
     fontSize: '12px',
     fontWeight: 400,
-    color: '#8a8078',
+    color: '#a0958a',
     background: 'none',
-    border: '1px solid #d0ccc6',
+    border: '1px solid #3a342d',
     borderRadius: '4px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
@@ -184,9 +185,10 @@ const s: Record<string, React.CSSProperties> = {
     flex: 1,
     padding: '12px 16px',
     fontSize: '15px',
-    border: '1px solid #d0ccc6',
+    border: '1px solid #3a342d',
     borderRadius: '4px',
-    background: '#fff',
+    background: '#1e1a15',
+    color: '#ece3d1',
     fontFamily: "'DM Sans', sans-serif",
     outline: 'none',
   },
@@ -194,8 +196,8 @@ const s: Record<string, React.CSSProperties> = {
     padding: '12px 24px',
     fontSize: '14px',
     fontWeight: 500,
-    color: '#fff',
-    background: '#5a5248',
+    color: '#1a1613',
+    background: '#ece3d1',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
@@ -212,20 +214,20 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px',
-    background: '#fff',
-    border: '1px solid #e8e4de',
+    background: '#1e1a15',
+    border: '1px solid #2a241e',
     borderRadius: '6px',
   },
   cardMain: {},
   cardTitle: {
     fontSize: '17px',
     fontWeight: 400,
-    color: '#3a3530',
+    color: '#ece3d1',
     marginBottom: '4px',
   },
   cardMeta: {
     fontSize: '13px',
-    color: '#8a8078',
+    color: '#a0958a',
   },
   cardActions: {
     display: 'flex',
@@ -235,8 +237,8 @@ const s: Record<string, React.CSSProperties> = {
     padding: '6px 14px',
     fontSize: '12px',
     fontWeight: 500,
-    color: '#fff',
-    background: '#8a7d6e',
+    color: '#ece3d1',
+    background: '#3a342d',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
@@ -244,7 +246,7 @@ const s: Record<string, React.CSSProperties> = {
     letterSpacing: '0.5px',
   },
   empty: {
-    color: '#8a8078',
+    color: '#a0958a',
     fontSize: '14px',
   },
 };
