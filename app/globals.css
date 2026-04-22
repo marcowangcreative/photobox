@@ -19,9 +19,9 @@
   --surface-elevated: #3a342d;
 
   --tray-outer: #2a241e;
-  --tray-grad-1: #1a1510;
-  --tray-grad-2: #1f1a14;
-  --tray-grad-3: #221c16;
+  --tray-grad-1: #0a0806;
+  --tray-grad-2: #0d0a07;
+  --tray-grad-3: #100c08;
   --lid-bg: #2a241e;
 
   --border: #3a342d;
@@ -89,9 +89,9 @@
   --surface-elevated: #e3d9c2;
 
   --tray-outer: #d9cdb4;
-  --tray-grad-1: #ebe0c8;
-  --tray-grad-2: #e0d3b8;
-  --tray-grad-3: #dcceb0;
+  --tray-grad-1: #8a7d64;
+  --tray-grad-2: #7a6d54;
+  --tray-grad-3: #6d6048;
   --lid-bg: #d9cdb4;
 
   --border: #c9bfae;

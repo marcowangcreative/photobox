@@ -845,13 +845,13 @@ const st: Record<string, React.CSSProperties> = {
     height: '100%',
     borderRadius: '0px',
     background:
-      'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 60%, transparent 100%),' +
+      'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.15) 100%),' +
       'linear-gradient(180deg, var(--tray-grad-1) 0%, var(--tray-grad-2) 30%, var(--tray-grad-3) 70%, var(--tray-grad-1) 100%)',
     boxShadow:
-      'inset 0 2px 6px rgba(0,0,0,0.6),' +
-      'inset 0 -1px 3px rgba(0,0,0,0.4),' +
-      'inset 2px 0 4px rgba(0,0,0,0.3),' +
-      'inset -2px 0 4px rgba(0,0,0,0.3)',
+      'inset 0 4px 10px rgba(0,0,0,0.8),' +
+      'inset 0 -2px 6px rgba(0,0,0,0.6),' +
+      'inset 3px 0 6px rgba(0,0,0,0.5),' +
+      'inset -3px 0 6px rgba(0,0,0,0.5)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
