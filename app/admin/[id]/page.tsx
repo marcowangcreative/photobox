@@ -85,6 +85,7 @@ interface Gallery {
   sneak_peek_label: string;
   is_published: boolean;
   grid_style: 'stacked' | 'clean';
+  box_color: string | null;
 }
 
 export default function GalleryEditor() {
@@ -301,6 +302,48 @@ export default function GalleryEditor() {
                       {opt.label}
                     </button>
                   ))}
+                </div>
+                <label style={{ ...s.label, marginTop: '12px' }}>Box Color</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="color"
+                    value={gallery.box_color || '#2a241e'}
+                    onChange={e => updateGallery({ box_color: e.target.value })}
+                    style={{
+                      width: '40px',
+                      height: '32px',
+                      padding: 0,
+                      border: '1px solid var(--border)',
+                      borderRadius: '4px',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <input
+                    style={{ ...s.input, width: '110px' }}
+                    value={gallery.box_color || ''}
+                    placeholder="#2a241e"
+                    onChange={e => {
+                      const v = e.target.value.trim();
+                      updateGallery({ box_color: v || null });
+                    }}
+                  />
+                  {gallery.box_color && (
+                    <button
+                      type="button"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                      }}
+                      onClick={() => updateGallery({ box_color: null })}
+                    >
+                      reset
+                    </button>
+                  )}
                 </div>
               </div>
               <div style={s.sidebar}>

@@ -15,6 +15,7 @@ interface Props {
   photos: PhotoData[];
   galleryUrl: string;
   gridStyle?: 'stacked' | 'clean';
+  boxColor?: string | null;
 }
 
 function GridIcon({ color = 'var(--text-accent)' }: { color?: string }) {
@@ -82,7 +83,10 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked' }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor }: Props) {
+  const sceneStyle = boxColor
+    ? { ...st.scene, ['--tray-outer' as string]: boxColor, ['--lid-bg' as string]: boxColor } as React.CSSProperties
+    : st.scene;
   const [photos] = useState(() => rawPhotos.map((p, i) => ({
     ...p,
     idx: i,
@@ -395,7 +399,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   // ——— GRID VIEW ———
   if (mode === 'grid') {
     return (
-      <div style={st.scene}>
+      <div style={sceneStyle}>
         <style>{baseStyles}</style>
         <div style={st.header}>
           <h1 style={st.title}>{coupleNames}</h1>
@@ -525,7 +529,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
 
   // ——— STACK / TRAY VIEW ———
   return (
-    <div style={st.scene}>
+    <div style={sceneStyle}>
       <style>{baseStyles}</style>
 
       <div style={{

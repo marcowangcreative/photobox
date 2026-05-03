@@ -4,6 +4,7 @@ export interface Gallery {
   couple_names: string;
   sneak_peek_label: string;
   is_published: boolean;
+  box_color: string | null;
   created_at: string;
   updated_at: string;
 }
