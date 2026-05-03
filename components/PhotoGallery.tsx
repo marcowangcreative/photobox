@@ -700,7 +700,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         <>
           <div
             style={{
-              ...(fullscreen ? { ...st.overlay, ...st.overlayFullscreen } : st.overlay),
+              ...(fullscreen
+                ? { ...st.overlay, ...st.overlayFullscreen }
+                : { ...st.overlay, background: 'transparent', backdropFilter: 'none', WebkitBackdropFilter: 'none' }),
               animation: phase === 'discarding'
                 ? 'fadeOut 0.28s ease forwards'
                 : phase === 'pulling' ? 'fadeIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) forwards' : undefined,
