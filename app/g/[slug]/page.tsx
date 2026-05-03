@@ -63,6 +63,7 @@ export default async function GalleryPage({ params }: Props) {
       boxColor={gallery.box_color}
       textColor={gallery.text_color}
       sneakPeekColor={gallery.sneak_peek_color}
+      feltColor={gallery.felt_color}
     />
   );
 }

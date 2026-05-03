@@ -18,6 +18,7 @@ interface Props {
   boxColor?: string | null;
   textColor?: string | null;
   sneakPeekColor?: string | null;
+  feltColor?: string | null;
 }
 
 function GridIcon({ color = 'var(--text-accent)' }: { color?: string }) {
@@ -85,7 +86,7 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor }: Props) {
   const sceneOverrides: Record<string, string> = {};
   if (boxColor) {
     sceneOverrides['--tray-outer'] = boxColor;
@@ -96,6 +97,11 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   }
   if (sneakPeekColor) {
     sceneOverrides['--text-muted'] = sneakPeekColor;
+  }
+  if (feltColor) {
+    sceneOverrides['--tray-grad-1'] = feltColor;
+    sceneOverrides['--tray-grad-2'] = feltColor;
+    sceneOverrides['--tray-grad-3'] = feltColor;
   }
   const sceneStyle = Object.keys(sceneOverrides).length
     ? ({ ...st.scene, ...sceneOverrides } as React.CSSProperties)

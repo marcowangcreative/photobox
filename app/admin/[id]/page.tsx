@@ -88,6 +88,7 @@ interface Gallery {
   box_color: string | null;
   text_color: string | null;
   sneak_peek_color: string | null;
+  felt_color: string | null;
 }
 
 export default function GalleryEditor() {
@@ -426,6 +427,48 @@ export default function GalleryEditor() {
                         textDecoration: 'underline',
                       }}
                       onClick={() => updateGallery({ sneak_peek_color: null })}
+                    >
+                      reset
+                    </button>
+                  )}
+                </div>
+                <label style={{ ...s.label, marginTop: '12px' }}>Felt Color (box interior)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="color"
+                    value={gallery.felt_color || '#0a0806'}
+                    onChange={e => updateGallery({ felt_color: e.target.value })}
+                    style={{
+                      width: '40px',
+                      height: '32px',
+                      padding: 0,
+                      border: '1px solid var(--border)',
+                      borderRadius: '4px',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                    }}
+                  />
+                  <input
+                    style={{ ...s.input, width: '110px' }}
+                    value={gallery.felt_color || ''}
+                    placeholder="#0a0806"
+                    onChange={e => {
+                      const v = e.target.value.trim();
+                      updateGallery({ felt_color: v || null });
+                    }}
+                  />
+                  {gallery.felt_color && (
+                    <button
+                      type="button"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                      }}
+                      onClick={() => updateGallery({ felt_color: null })}
                     >
                       reset
                     </button>
