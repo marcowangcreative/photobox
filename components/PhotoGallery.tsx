@@ -155,6 +155,8 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   const [isMobile, setIsMobile] = useState(false);
   const [desktopCols, setDesktopCols] = useState(5);
   const [hoveredScatterId, setHoveredScatterId] = useState<string | null>(null);
+  const [liftedOrder, setLiftedOrder] = useState<Record<string, number>>({});
+  const liftCounterRef = useRef(0);
   const [lidState, setLidState] = useState<'closed' | 'shrinking' | 'open'>('closed');
   const [showHelper, setShowHelper] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -496,13 +498,21 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                               ? `${200 / desktopCols}%`
                               : `${100 / desktopCols}%`,
                           }),
-                      zIndex: isHovered ? 100 : Math.min(i, 40),
+                      zIndex: isHovered
+                        ? 10000
+                        : (liftedOrder[photo.id] ? 1000 + liftedOrder[photo.id] : Math.min(i, 40)),
                       transform: `rotate(${rot}deg) translateX(${offsetX}px)${hoverLift}`,
                       marginTop: inFirstRow ? '0px' : (isMobile ? '-30px' : `${desktopOverlap}px`),
                       transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                     }}
                     onClick={() => setGridViewing(photo)}
-                    onMouseEnter={!isMobile ? () => setHoveredScatterId(photo.id) : undefined}
+                    onMouseEnter={!isMobile ? () => {
+                      setHoveredScatterId(photo.id);
+                      setLiftedOrder(prev => {
+                        liftCounterRef.current += 1;
+                        return { ...prev, [photo.id]: liftCounterRef.current };
+                      });
+                    } : undefined}
                     onMouseLeave={!isMobile ? () => setHoveredScatterId(null) : undefined}
                   >
                     <div style={{
