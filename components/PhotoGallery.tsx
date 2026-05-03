@@ -21,6 +21,25 @@ interface Props {
   feltColor?: string | null;
 }
 
+// Shift a #rrggbb color toward black (amount < 0) or white (amount > 0).
+// amount is in [-1, 1]; -0.4 means 40% closer to black.
+function shadeHex(hex: string, amount: number): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  let r = (n >> 16) & 0xff;
+  let g = (n >> 8) & 0xff;
+  let b = n & 0xff;
+  const adj = (c: number) => amount < 0
+    ? Math.round(c * (1 + amount))
+    : Math.round(c + (255 - c) * amount);
+  r = Math.max(0, Math.min(255, adj(r)));
+  g = Math.max(0, Math.min(255, adj(g)));
+  b = Math.max(0, Math.min(255, adj(b)));
+  const h = (c: number) => c.toString(16).padStart(2, '0');
+  return `#${h(r)}${h(g)}${h(b)}`;
+}
+
 function GridIcon({ color = 'var(--text-accent)' }: { color?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill={color}>
@@ -99,8 +118,8 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     sceneOverrides['--text-muted'] = sneakPeekColor;
   }
   if (feltColor) {
-    sceneOverrides['--tray-grad-1'] = feltColor;
-    sceneOverrides['--tray-grad-2'] = feltColor;
+    sceneOverrides['--tray-grad-1'] = shadeHex(feltColor, -0.4);
+    sceneOverrides['--tray-grad-2'] = shadeHex(feltColor, -0.2);
     sceneOverrides['--tray-grad-3'] = feltColor;
   }
   const sceneStyle = Object.keys(sceneOverrides).length
