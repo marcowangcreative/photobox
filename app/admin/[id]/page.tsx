@@ -3,6 +3,71 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
+const CLIENT_MAX_LONG_EDGE = 2400;
+const CLIENT_JPEG_QUALITY = 0.85;
+const SKIP_RESIZE_BELOW_BYTES = 1_500_000;
+
+async function downscaleImage(file: File): Promise<File> {
+  if (!file.type.startsWith('image/')) return file;
+  if (file.size < SKIP_RESIZE_BELOW_BYTES) return file;
+
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch {
+    return file;
+  }
+
+  const longEdge = Math.max(bitmap.width, bitmap.height);
+  if (longEdge <= CLIENT_MAX_LONG_EDGE) {
+    bitmap.close();
+    return file;
+  }
+
+  const scale = CLIENT_MAX_LONG_EDGE / longEdge;
+  const targetW = Math.round(bitmap.width * scale);
+  const targetH = Math.round(bitmap.height * scale);
+
+  let curW = bitmap.width;
+  let curH = bitmap.height;
+  let src: CanvasImageSource = bitmap;
+
+  while (curW * 0.5 > targetW) {
+    const nextW = Math.round(curW * 0.5);
+    const nextH = Math.round(curH * 0.5);
+    const step = document.createElement('canvas');
+    step.width = nextW;
+    step.height = nextH;
+    const sctx = step.getContext('2d');
+    if (!sctx) { bitmap.close(); return file; }
+    sctx.imageSmoothingEnabled = true;
+    sctx.imageSmoothingQuality = 'high';
+    sctx.drawImage(src, 0, 0, nextW, nextH);
+    src = step;
+    curW = nextW;
+    curH = nextH;
+  }
+
+  const final = document.createElement('canvas');
+  final.width = targetW;
+  final.height = targetH;
+  const fctx = final.getContext('2d');
+  if (!fctx) { bitmap.close(); return file; }
+  fctx.imageSmoothingEnabled = true;
+  fctx.imageSmoothingQuality = 'high';
+  fctx.drawImage(src, 0, 0, targetW, targetH);
+  bitmap.close();
+
+  const blob: Blob | null = await new Promise(resolve =>
+    final.toBlob(resolve, 'image/jpeg', CLIENT_JPEG_QUALITY)
+  );
+  if (!blob) return file;
+  if (blob.size >= file.size) return file;
+
+  const newName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+  return new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() });
+}
+
 interface Photo {
   id: string;
   storage_path: string;
@@ -77,7 +142,14 @@ export default function GalleryEditor() {
       if (abortRef.current) break;
 
       setUploadCurrent(i + 1);
-      const file = fileArray[i];
+      const original = fileArray[i];
+
+      let file: File;
+      try {
+        file = await downscaleImage(original);
+      } catch {
+        file = original;
+      }
 
       const formData = new FormData();
       formData.append('gallery_id', gallery.id);
@@ -89,13 +161,13 @@ export default function GalleryEditor() {
         const data = await res.json();
 
         if (data.error) {
-          setUploadFailed(prev => [...prev, file.name]);
+          setUploadFailed(prev => [...prev, original.name]);
         } else {
           // Add to grid immediately
           setPhotos(prev => [...prev, data]);
         }
       } catch {
-        setUploadFailed(prev => [...prev, file.name]);
+        setUploadFailed(prev => [...prev, original.name]);
       }
     }
 
