@@ -5,6 +5,7 @@ export interface Gallery {
   sneak_peek_label: string;
   is_published: boolean;
   box_color: string | null;
+  text_color: string | null;
   created_at: string;
   updated_at: string;
 }
