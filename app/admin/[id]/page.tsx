@@ -494,11 +494,11 @@ export default function GalleryEditor() {
                   onChange={v => updateGallery({ title_color: v })} />
               </div>
               <BoxPreview
-                boxColor={gallery.box_color || '#2a241e'}
+                boxColor={gallery.box_color || 'var(--tray-outer)'}
                 feltColor={gallery.felt_color || '#100c08'}
-                textColor={gallery.text_color || '#ece3d1'}
-                sneakPeekColor={gallery.sneak_peek_color || '#a0958a'}
-                titleColor={gallery.title_color || '#1a1613'}
+                textColor={gallery.text_color || 'var(--text)'}
+                sneakPeekColor={gallery.sneak_peek_color || 'var(--text-muted)'}
+                titleColor={gallery.title_color || 'var(--title)'}
                 coupleNames={gallery.couple_names}
                 sneakPeekLabel={gallery.sneak_peek_label}
               />
