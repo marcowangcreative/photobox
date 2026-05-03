@@ -6,6 +6,7 @@ export interface Gallery {
   is_published: boolean;
   box_color: string | null;
   text_color: string | null;
+  sneak_peek_color: string | null;
   created_at: string;
   updated_at: string;
 }

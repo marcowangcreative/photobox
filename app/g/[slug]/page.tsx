@@ -62,6 +62,7 @@ export default async function GalleryPage({ params }: Props) {
       gridStyle={gallery.grid_style || 'stacked'}
       boxColor={gallery.box_color}
       textColor={gallery.text_color}
+      sneakPeekColor={gallery.sneak_peek_color}
     />
   );
 }
