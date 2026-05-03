@@ -19,6 +19,7 @@ interface Props {
   textColor?: string | null;
   sneakPeekColor?: string | null;
   feltColor?: string | null;
+  titleColor?: string | null;
 }
 
 // Shift a #rrggbb color toward black (amount < 0) or white (amount > 0).
@@ -105,7 +106,7 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor }: Props) {
   const sceneOverrides: Record<string, string> = {};
   if (boxColor) {
     sceneOverrides['--tray-outer'] = boxColor;
@@ -124,6 +125,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     // Turn off the dark radial overlay so the felt color shows through;
     // depth still comes from the derived gradient stops + inset shadows.
     sceneOverrides['--tray-overlay'] = 'linear-gradient(transparent, transparent)';
+  }
+  if (titleColor) {
+    sceneOverrides['--title'] = titleColor;
   }
   const sceneStyle = Object.keys(sceneOverrides).length
     ? ({ ...st.scene, ...sceneOverrides } as React.CSSProperties)
@@ -819,7 +823,7 @@ const st: Record<string, React.CSSProperties> = {
     fontSize: '22px',
     fontWeight: 400,
     fontStyle: 'italic',
-    color: 'var(--text)',
+    color: 'var(--title)',
     letterSpacing: '2px',
     marginBottom: '4px',
   },

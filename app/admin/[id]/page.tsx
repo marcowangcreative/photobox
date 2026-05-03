@@ -3,6 +3,152 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
+function shadeHex(hex: string, amount: number): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  let r = (n >> 16) & 0xff;
+  let g = (n >> 8) & 0xff;
+  let b = n & 0xff;
+  const adj = (c: number) => amount < 0
+    ? Math.round(c * (1 + amount))
+    : Math.round(c + (255 - c) * amount);
+  r = Math.max(0, Math.min(255, adj(r)));
+  g = Math.max(0, Math.min(255, adj(g)));
+  b = Math.max(0, Math.min(255, adj(b)));
+  const h = (c: number) => c.toString(16).padStart(2, '0');
+  return `#${h(r)}${h(g)}${h(b)}`;
+}
+
+function ColorRow({ label, value, placeholder, onChange }: {
+  label: string;
+  value: string | null;
+  placeholder: string;
+  onChange: (v: string | null) => void;
+}) {
+  const display = value || placeholder;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}>
+      <label style={{ position: 'relative', width: '36px', height: '28px', flexShrink: 0, cursor: 'pointer' }}>
+        <input
+          type="color"
+          value={display}
+          onChange={e => onChange(e.target.value)}
+          style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
+        />
+        <div style={{
+          width: '100%', height: '100%', borderRadius: '4px',
+          background: display,
+          border: '1px solid var(--border)',
+          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.04)',
+        }} />
+      </label>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-2)', marginBottom: '2px' }}>{label}</div>
+        <input
+          value={value || ''}
+          placeholder={placeholder}
+          onChange={e => {
+            const v = e.target.value.trim();
+            onChange(v || null);
+          }}
+          style={{
+            width: '100%', maxWidth: '120px', padding: '4px 8px',
+            fontSize: '12px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            border: '1px solid var(--border)', borderRadius: '3px',
+            background: 'var(--surface)', color: 'var(--text-muted)',
+            outline: 'none',
+          }}
+        />
+      </div>
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange(null)}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-muted)', fontSize: '11px', padding: '4px',
+          }}
+          title="Reset to default"
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  );
+}
+
+function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor, coupleNames, sneakPeekLabel }: {
+  boxColor: string;
+  feltColor: string;
+  textColor: string;
+  sneakPeekColor: string;
+  titleColor: string;
+  coupleNames: string;
+  sneakPeekLabel: string;
+}) {
+  const grad1 = shadeHex(feltColor, -0.4);
+  const grad2 = shadeHex(feltColor, -0.2);
+  const grad3 = feltColor;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+      <div style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase' }}>
+        Preview
+      </div>
+      <div style={{
+        width: '160px', height: '224px', borderRadius: '2px',
+        background: boxColor, padding: '5px',
+        boxShadow:
+          'inset 0 0 0 1px rgba(255,255,255,0.05),' +
+          '0 1px 2px rgba(0,0,0,0.5),' +
+          '0 6px 18px rgba(0,0,0,0.35)',
+      }}>
+        <div style={{
+          width: '100%', height: '100%',
+          background: `linear-gradient(180deg, ${grad1} 0%, ${grad2} 30%, ${grad3} 70%, ${grad1} 100%)`,
+          boxShadow:
+            'inset 0 4px 8px rgba(0,0,0,0.7),' +
+            'inset 0 -2px 5px rgba(0,0,0,0.5),' +
+            'inset 2px 0 5px rgba(0,0,0,0.4),' +
+            'inset -2px 0 5px rgba(0,0,0,0.4)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          padding: '12px', textAlign: 'center',
+        }}>
+          <div style={{
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: 'italic', fontSize: '13px',
+            color: textColor, letterSpacing: '1px', marginBottom: '4px',
+          }}>
+            {coupleNames}
+          </div>
+          <div style={{
+            fontSize: '9px', color: sneakPeekColor,
+            letterSpacing: '2px', textTransform: 'uppercase',
+          }}>
+            {sneakPeekLabel}
+          </div>
+        </div>
+      </div>
+      <div style={{
+        width: '160px', padding: '10px 8px', borderRadius: '3px',
+        background: 'var(--surface)', textAlign: 'center',
+      }}>
+        <div style={{ fontSize: '8px', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
+          Grid title
+        </div>
+        <div style={{
+          fontFamily: "'Playfair Display', serif",
+          fontStyle: 'italic', fontSize: '14px',
+          color: titleColor, letterSpacing: '1.5px',
+        }}>
+          {coupleNames}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const CLIENT_MAX_LONG_EDGE = 2400;
 const CLIENT_JPEG_QUALITY = 0.85;
 const SKIP_RESIZE_BELOW_BYTES = 1_500_000;
@@ -89,6 +235,7 @@ interface Gallery {
   text_color: string | null;
   sneak_peek_color: string | null;
   felt_color: string | null;
+  title_color: string | null;
 }
 
 export default function GalleryEditor() {
@@ -306,174 +453,6 @@ export default function GalleryEditor() {
                     </button>
                   ))}
                 </div>
-                <label style={{ ...s.label, marginTop: '12px' }}>Box Color</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="color"
-                    value={gallery.box_color || '#2a241e'}
-                    onChange={e => updateGallery({ box_color: e.target.value })}
-                    style={{
-                      width: '40px',
-                      height: '32px',
-                      padding: 0,
-                      border: '1px solid var(--border)',
-                      borderRadius: '4px',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <input
-                    style={{ ...s.input, width: '110px' }}
-                    value={gallery.box_color || ''}
-                    placeholder="#2a241e"
-                    onChange={e => {
-                      const v = e.target.value.trim();
-                      updateGallery({ box_color: v || null });
-                    }}
-                  />
-                  {gallery.box_color && (
-                    <button
-                      type="button"
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        fontSize: '12px',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                      }}
-                      onClick={() => updateGallery({ box_color: null })}
-                    >
-                      reset
-                    </button>
-                  )}
-                </div>
-                <label style={{ ...s.label, marginTop: '12px' }}>Text Color</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="color"
-                    value={gallery.text_color || '#ece3d1'}
-                    onChange={e => updateGallery({ text_color: e.target.value })}
-                    style={{
-                      width: '40px',
-                      height: '32px',
-                      padding: 0,
-                      border: '1px solid var(--border)',
-                      borderRadius: '4px',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <input
-                    style={{ ...s.input, width: '110px' }}
-                    value={gallery.text_color || ''}
-                    placeholder="#ece3d1"
-                    onChange={e => {
-                      const v = e.target.value.trim();
-                      updateGallery({ text_color: v || null });
-                    }}
-                  />
-                  {gallery.text_color && (
-                    <button
-                      type="button"
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        fontSize: '12px',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                      }}
-                      onClick={() => updateGallery({ text_color: null })}
-                    >
-                      reset
-                    </button>
-                  )}
-                </div>
-                <label style={{ ...s.label, marginTop: '12px' }}>Sneak Peek Color</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="color"
-                    value={gallery.sneak_peek_color || '#a0958a'}
-                    onChange={e => updateGallery({ sneak_peek_color: e.target.value })}
-                    style={{
-                      width: '40px',
-                      height: '32px',
-                      padding: 0,
-                      border: '1px solid var(--border)',
-                      borderRadius: '4px',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <input
-                    style={{ ...s.input, width: '110px' }}
-                    value={gallery.sneak_peek_color || ''}
-                    placeholder="#a0958a"
-                    onChange={e => {
-                      const v = e.target.value.trim();
-                      updateGallery({ sneak_peek_color: v || null });
-                    }}
-                  />
-                  {gallery.sneak_peek_color && (
-                    <button
-                      type="button"
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        fontSize: '12px',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                      }}
-                      onClick={() => updateGallery({ sneak_peek_color: null })}
-                    >
-                      reset
-                    </button>
-                  )}
-                </div>
-                <label style={{ ...s.label, marginTop: '12px' }}>Felt Color (box interior)</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="color"
-                    value={gallery.felt_color || '#0a0806'}
-                    onChange={e => updateGallery({ felt_color: e.target.value })}
-                    style={{
-                      width: '40px',
-                      height: '32px',
-                      padding: 0,
-                      border: '1px solid var(--border)',
-                      borderRadius: '4px',
-                      background: 'transparent',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <input
-                    style={{ ...s.input, width: '110px' }}
-                    value={gallery.felt_color || ''}
-                    placeholder="#0a0806"
-                    onChange={e => {
-                      const v = e.target.value.trim();
-                      updateGallery({ felt_color: v || null });
-                    }}
-                  />
-                  {gallery.felt_color && (
-                    <button
-                      type="button"
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        fontSize: '12px',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                      }}
-                      onClick={() => updateGallery({ felt_color: null })}
-                    >
-                      reset
-                    </button>
-                  )}
-                </div>
               </div>
               <div style={s.sidebar}>
                 <div style={s.linkBox}>
@@ -498,6 +477,31 @@ export default function GalleryEditor() {
                   {saving && <span style={s.savingBadge}> saving...</span>}
                 </div>
               </div>
+            </div>
+
+            {/* Theme panel */}
+            <div style={s.themePanel}>
+              <div style={s.themeRows}>
+                <ColorRow label="Box exterior" value={gallery.box_color} placeholder="#2a241e"
+                  onChange={v => updateGallery({ box_color: v })} />
+                <ColorRow label="Box interior (felt)" value={gallery.felt_color} placeholder="#0a0806"
+                  onChange={v => updateGallery({ felt_color: v })} />
+                <ColorRow label="Couple names (lid)" value={gallery.text_color} placeholder="#ece3d1"
+                  onChange={v => updateGallery({ text_color: v })} />
+                <ColorRow label="Sneak-peek label (lid)" value={gallery.sneak_peek_color} placeholder="#a0958a"
+                  onChange={v => updateGallery({ sneak_peek_color: v })} />
+                <ColorRow label="Grid title" value={gallery.title_color} placeholder="#1a1613"
+                  onChange={v => updateGallery({ title_color: v })} />
+              </div>
+              <BoxPreview
+                boxColor={gallery.box_color || '#2a241e'}
+                feltColor={gallery.felt_color || '#100c08'}
+                textColor={gallery.text_color || '#ece3d1'}
+                sneakPeekColor={gallery.sneak_peek_color || '#a0958a'}
+                titleColor={gallery.title_color || '#1a1613'}
+                coupleNames={gallery.couple_names}
+                sneakPeekLabel={gallery.sneak_peek_label}
+              />
             </div>
 
             {/* Upload zone */}
@@ -638,6 +642,24 @@ const s: Record<string, React.CSSProperties> = {
     gap: '24px',
     marginBottom: '28px',
     flexWrap: 'wrap' as const,
+  },
+  themePanel: {
+    display: 'flex',
+    gap: '28px',
+    padding: '20px',
+    marginBottom: '28px',
+    border: '1px solid var(--border-soft)',
+    borderRadius: '6px',
+    background: 'var(--surface)',
+    flexWrap: 'wrap' as const,
+    alignItems: 'flex-start',
+  },
+  themeRows: {
+    flex: 1,
+    minWidth: '260px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
   },
   fields: { flex: 1, minWidth: '260px' },
   sidebar: {
