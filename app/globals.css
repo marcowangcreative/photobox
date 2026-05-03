@@ -22,6 +22,7 @@
   --tray-grad-1: #0a0806;
   --tray-grad-2: #0d0a07;
   --tray-grad-3: #100c08;
+  --tray-overlay: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.15) 100%);
   --lid-bg: #2a241e;
 
   --border: #3a342d;
@@ -92,6 +93,7 @@
   --tray-grad-1: #8a7d64;
   --tray-grad-2: #7a6d54;
   --tray-grad-3: #6d6048;
+  --tray-overlay: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%);
   --lid-bg: #d9cdb4;
 
   --border: #c9bfae;

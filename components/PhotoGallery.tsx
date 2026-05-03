@@ -121,6 +121,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     sceneOverrides['--tray-grad-1'] = shadeHex(feltColor, -0.4);
     sceneOverrides['--tray-grad-2'] = shadeHex(feltColor, -0.2);
     sceneOverrides['--tray-grad-3'] = feltColor;
+    // Turn off the dark radial overlay so the felt color shows through;
+    // depth still comes from the derived gradient stops + inset shadows.
+    sceneOverrides['--tray-overlay'] = 'linear-gradient(transparent, transparent)';
   }
   const sceneStyle = Object.keys(sceneOverrides).length
     ? ({ ...st.scene, ...sceneOverrides } as React.CSSProperties)
@@ -887,7 +890,7 @@ const st: Record<string, React.CSSProperties> = {
     height: '100%',
     borderRadius: '0px',
     background:
-      'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.15) 100%),' +
+      'var(--tray-overlay),' +
       'linear-gradient(180deg, var(--tray-grad-1) 0%, var(--tray-grad-2) 30%, var(--tray-grad-3) 70%, var(--tray-grad-1) 100%)',
     boxShadow:
       'inset 0 4px 10px rgba(0,0,0,0.8),' +
