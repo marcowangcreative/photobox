@@ -78,6 +78,55 @@ function ColorRow({ label, value, placeholder, onChange }: {
   );
 }
 
+function SliderRow({ label, value, isCustom, min, max, step, format, onChange, onReset }: {
+  label: string;
+  value: number;
+  isCustom: boolean;
+  min: number;
+  max: number;
+  step: number;
+  format: (n: number) => string;
+  onChange: (n: number) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}>
+      <div style={{
+        width: '36px', height: '28px', flexShrink: 0,
+        borderRadius: '4px', border: '1px solid var(--border)',
+        background: `rgba(0,0,0,${(1 - value).toFixed(2)})`,
+      }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-2)', marginBottom: '2px' }}>
+          {label} <span style={{ color: 'var(--text-muted)', fontFamily: 'ui-monospace, monospace', fontSize: '11px' }}>{format(value)}</span>
+        </div>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={e => onChange(parseFloat(e.target.value))}
+          style={{ width: '100%', maxWidth: '160px', accentColor: 'var(--accent)' }}
+        />
+      </div>
+      {isCustom && (
+        <button
+          type="button"
+          onClick={onReset}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-muted)', fontSize: '11px', padding: '4px',
+          }}
+          title="Reset to default"
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  );
+}
+
 function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor, coupleNames, sneakPeekLabel }: {
   boxColor: string;
   feltColor: string;
@@ -236,6 +285,8 @@ interface Gallery {
   sneak_peek_color: string | null;
   felt_color: string | null;
   title_color: string | null;
+  paper_color: string | null;
+  print_brightness: number | null;
 }
 
 export default function GalleryEditor() {
@@ -492,6 +543,16 @@ export default function GalleryEditor() {
                   onChange={v => updateGallery({ sneak_peek_color: v })} />
                 <ColorRow label="Grid title" value={gallery.title_color} placeholder="#1a1613"
                   onChange={v => updateGallery({ title_color: v })} />
+                <ColorRow label="Photo paper (frame)" value={gallery.paper_color} placeholder="#f5f0e8"
+                  onChange={v => updateGallery({ paper_color: v })} />
+                <SliderRow label="Top photo darken"
+                  value={gallery.print_brightness ?? 0.92}
+                  isCustom={gallery.print_brightness != null}
+                  min={0.85} max={1.0} step={0.01}
+                  format={n => `${Math.round((1 - n) * 100)}%`}
+                  onChange={n => updateGallery({ print_brightness: n })}
+                  onReset={() => updateGallery({ print_brightness: null })}
+                />
               </div>
               <BoxPreview
                 boxColor={gallery.box_color || 'var(--tray-outer)'}

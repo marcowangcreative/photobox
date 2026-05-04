@@ -9,6 +9,8 @@ export interface Gallery {
   sneak_peek_color: string | null;
   felt_color: string | null;
   title_color: string | null;
+  paper_color: string | null;
+  print_brightness: number | null;
   created_at: string;
   updated_at: string;
 }

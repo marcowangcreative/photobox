@@ -20,6 +20,8 @@ interface Props {
   sneakPeekColor?: string | null;
   feltColor?: string | null;
   titleColor?: string | null;
+  paperColor?: string | null;
+  printBrightness?: number | null;
 }
 
 // Shift a #rrggbb color toward black (amount < 0) or white (amount > 0).
@@ -106,7 +108,7 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, paperColor, printBrightness }: Props) {
   const sceneOverrides: Record<string, string> = {};
   if (boxColor) {
     sceneOverrides['--tray-outer'] = boxColor;
@@ -128,6 +130,12 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   }
   if (titleColor) {
     sceneOverrides['--title'] = titleColor;
+  }
+  if (paperColor) {
+    sceneOverrides['--print-bg'] = paperColor;
+  }
+  if (printBrightness != null) {
+    sceneOverrides['--print-img-brightness'] = String(printBrightness);
   }
   const sceneStyle = Object.keys(sceneOverrides).length
     ? ({ ...st.scene, ...sceneOverrides } as React.CSSProperties)
