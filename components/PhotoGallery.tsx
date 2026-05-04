@@ -1174,6 +1174,7 @@ const st: Record<string, React.CSSProperties> = {
     padding: '16px',
   },
   viewPrint: {
+    boxSizing: 'content-box',
     background: 'var(--print-bg)',
     padding: '12px',
     height: 'min(90vh, 1050px)',
@@ -1184,6 +1185,7 @@ const st: Record<string, React.CSSProperties> = {
     display: 'flex',
   },
   viewPrintLandscape: {
+    boxSizing: 'content-box',
     background: 'var(--print-bg)',
     padding: '12px',
     height: 'min(85vh, 720px)',
@@ -1194,6 +1196,7 @@ const st: Record<string, React.CSSProperties> = {
     display: 'flex',
   },
   viewPrintLandscapeMobile: {
+    boxSizing: 'content-box',
     background: 'var(--print-bg)',
     padding: '12px',
     width: 'min(80vh, 800px)',
