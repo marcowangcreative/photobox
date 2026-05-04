@@ -127,60 +127,111 @@ function SliderRow({ label, value, isCustom, min, max, step, format, onChange, o
   );
 }
 
-function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor, coupleNames, sneakPeekLabel }: {
+function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor, paperColor, printBrightness, coupleNames, sneakPeekLabel, hasFeltOverride }: {
   boxColor: string;
   feltColor: string;
   textColor: string;
   sneakPeekColor: string;
   titleColor: string;
+  paperColor: string;
+  printBrightness: number;
   coupleNames: string;
   sneakPeekLabel: string;
+  hasFeltOverride: boolean;
 }) {
   const grad1 = shadeHex(feltColor, -0.4);
   const grad2 = shadeHex(feltColor, -0.2);
   const grad3 = feltColor;
+  const W = 120;
+  const H = 180;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
       <div style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase' }}>
         Preview
       </div>
-      <div style={{
-        width: '160px', height: '224px', borderRadius: '2px',
-        background: boxColor, padding: '5px',
-        boxShadow:
-          'inset 0 0 0 1px rgba(255,255,255,0.05),' +
-          '0 1px 2px rgba(0,0,0,0.5),' +
-          '0 6px 18px rgba(0,0,0,0.35)',
-      }}>
-        <div style={{
-          width: '100%', height: '100%',
-          background: `linear-gradient(180deg, ${grad1} 0%, ${grad2} 30%, ${grad3} 70%, ${grad1} 100%)`,
-          boxShadow:
-            'inset 0 4px 8px rgba(0,0,0,0.7),' +
-            'inset 0 -2px 5px rgba(0,0,0,0.5),' +
-            'inset 2px 0 5px rgba(0,0,0,0.4),' +
-            'inset -2px 0 5px rgba(0,0,0,0.4)',
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          padding: '12px', textAlign: 'center',
-        }}>
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+        {/* Closed box — lid view */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
           <div style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: 'italic', fontSize: '13px',
-            color: textColor, letterSpacing: '1px', marginBottom: '4px',
+            width: `${W}px`, height: `${H}px`, borderRadius: '1px',
+            background: boxColor,
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.05),' +
+              '0 3px 12px rgba(0,0,0,0.4),' +
+              '0 8px 24px rgba(0,0,0,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            position: 'relative',
           }}>
-            {coupleNames}
+            <div style={{ textAlign: 'center', marginTop: '-15%', padding: '0 12px' }}>
+              <div style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '11px', fontWeight: 400,
+                color: textColor, letterSpacing: '2px',
+                textTransform: 'uppercase', marginBottom: '2px',
+                lineHeight: 1.2,
+                wordBreak: 'break-word',
+              }}>
+                {coupleNames}
+              </div>
+              <div style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: '9px', fontStyle: 'italic',
+                color: sneakPeekColor, letterSpacing: '0.5px',
+              }}>
+                {sneakPeekLabel}
+              </div>
+            </div>
           </div>
+          <div style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>closed</div>
+        </div>
+
+        {/* Open box — interior + top print */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
           <div style={{
-            fontSize: '9px', color: sneakPeekColor,
-            letterSpacing: '2px', textTransform: 'uppercase',
+            width: `${W}px`, height: `${H}px`, borderRadius: '1px',
+            background: boxColor, padding: '4px',
+            boxShadow:
+              'inset 0 0 0 1px rgba(255,255,255,0.05),' +
+              '0 3px 12px rgba(0,0,0,0.4),' +
+              '0 8px 24px rgba(0,0,0,0.3)',
           }}>
-            {sneakPeekLabel}
+            <div style={{
+              width: '100%', height: '100%', position: 'relative',
+              background: hasFeltOverride
+                ? `linear-gradient(180deg, ${grad1} 0%, ${grad2} 30%, ${grad3} 70%, ${grad1} 100%)`
+                : `radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.15) 100%),` +
+                  `linear-gradient(180deg, ${grad1} 0%, ${grad2} 30%, ${grad3} 70%, ${grad1} 100%)`,
+              boxShadow:
+                'inset 0 3px 7px rgba(0,0,0,0.7),' +
+                'inset 0 -2px 5px rgba(0,0,0,0.5),' +
+                'inset 2px 0 5px rgba(0,0,0,0.4),' +
+                'inset -2px 0 5px rgba(0,0,0,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {/* Top print sample */}
+              <div style={{
+                width: '70%', aspectRatio: '2/3',
+                background: paperColor, padding: '4px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+                transform: 'rotate(-1deg)',
+                boxSizing: 'content-box',
+                display: 'flex',
+              }}>
+                <div style={{
+                  width: '100%', height: '100%',
+                  background: 'linear-gradient(135deg, #b8a890 0%, #8a7a64 100%)',
+                  filter: `brightness(${printBrightness})`,
+                }} />
+              </div>
+            </div>
           </div>
+          <div style={{ fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>open</div>
         </div>
       </div>
+
+      {/* Grid title sample */}
       <div style={{
-        width: '160px', padding: '10px 8px', borderRadius: '3px',
+        width: `${W * 2 + 16}px`, padding: '10px 8px', borderRadius: '3px',
         background: 'var(--surface)', textAlign: 'center',
       }}>
         <div style={{ fontSize: '8px', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
@@ -560,6 +611,9 @@ export default function GalleryEditor() {
                 textColor={gallery.text_color || 'var(--text)'}
                 sneakPeekColor={gallery.sneak_peek_color || 'var(--text-muted)'}
                 titleColor={gallery.title_color || 'var(--title)'}
+                paperColor={gallery.paper_color || 'var(--print-bg)'}
+                printBrightness={gallery.print_brightness ?? 0.92}
+                hasFeltOverride={!!gallery.felt_color}
                 coupleNames={gallery.couple_names}
                 sneakPeekLabel={gallery.sneak_peek_label}
               />
