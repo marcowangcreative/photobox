@@ -35,7 +35,7 @@ export default function LoginPage() {
   return (
     <div style={styles.container}>
       <form onSubmit={handleLogin} style={styles.form}>
-        <h1 style={styles.title}>photobox</h1>
+        <img src="/photokase-logo.png" alt="Photokase" style={styles.logo} />
         <p style={styles.subtitle}>admin login</p>
 
         {error && <p style={styles.error}>{error}</p>}
@@ -88,13 +88,11 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '16px',
   },
-  title: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: '28px',
-    fontWeight: 600,
-    color: 'var(--text)',
-    textAlign: 'center',
-    margin: 0,
+  logo: {
+    width: '180px',
+    height: 'auto',
+    margin: '0 auto 4px',
+    filter: 'invert(var(--logo-invert))',
   },
   subtitle: {
     fontSize: '13px',
