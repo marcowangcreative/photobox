@@ -340,6 +340,24 @@ interface Gallery {
   title_color: string | null;
   print_brightness: number | null;
   font_preset: 'editorial' | 'romantic' | 'modern' | null;
+  price_cents: number;
+}
+
+interface OrderRow {
+  id: string;
+  status: string;
+  amount_cents: number;
+  customer_name: string | null;
+  customer_email: string | null;
+  shipping_name: string | null;
+  shipping_address_line1: string | null;
+  shipping_address_line2: string | null;
+  shipping_city: string | null;
+  shipping_state: string | null;
+  shipping_postal_code: string | null;
+  shipping_country: string | null;
+  created_at: string;
+  paid_at: string | null;
 }
 
 const FONT_PRESET_LIST = [
@@ -353,7 +371,8 @@ export default function GalleryEditor() {
   const router = useRouter();
   const [gallery, setGallery] = useState<Gallery | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [tab, setTab] = useState<'details' | 'design' | 'photos'>('details');
+  const [tab, setTab] = useState<'details' | 'design' | 'photos' | 'orders'>('details');
+  const [orders, setOrders] = useState<OrderRow[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadCurrent, setUploadCurrent] = useState(0);
   const [uploadTotal, setUploadTotal] = useState(0);
@@ -370,6 +389,7 @@ export default function GalleryEditor() {
   useEffect(() => {
     fetchGallery();
     fetchPhotos();
+    fetchOrders();
   }, [id]);
 
   async function fetchGallery() {
@@ -384,6 +404,21 @@ export default function GalleryEditor() {
     const res = await fetch(`/api/upload?gallery_id=${id}`);
     const data = await res.json();
     if (Array.isArray(data)) setPhotos(data);
+  }
+
+  async function fetchOrders() {
+    const res = await fetch(`/api/orders?gallery_id=${id}`);
+    const data = await res.json();
+    if (Array.isArray(data)) setOrders(data);
+  }
+
+  async function markOrderFulfilled(orderId: string) {
+    await fetch('/api/orders', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: orderId, status: 'fulfilled' }),
+    });
+    fetchOrders();
   }
 
   async function uploadFiles(files: FileList | File[]) {
@@ -560,6 +595,7 @@ export default function GalleryEditor() {
                 { key: 'details', label: 'Details' },
                 { key: 'design',  label: 'Design' },
                 { key: 'photos',  label: `Photos${photos.length ? ` · ${photos.length}` : ''}` },
+                { key: 'orders',  label: `Orders${orders.length ? ` · ${orders.length}` : ''}` },
               ].map(t => (
                 <button
                   key={t.key}
@@ -639,6 +675,34 @@ export default function GalleryEditor() {
                         {opt.label}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div style={s.card}>
+                  <div style={s.cardHead}>
+                    <div style={s.cardEyebrow}>Pricing</div>
+                    <div style={s.cardTitle}>Box price</div>
+                    <p style={s.cardHelp}>What couples (and their parents, friends) pay to order one curated print box of this gallery.</p>
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.fieldLabel}>USD</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ ...s.slugPrefix, borderRadius: '6px', border: '1px solid var(--border)' }}>$</span>
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        style={{ ...s.input, maxWidth: '160px' }}
+                        value={(gallery.price_cents ?? 54900) / 100}
+                        onChange={e => {
+                          const dollars = parseFloat(e.target.value);
+                          if (!isNaN(dollars) && dollars >= 0) {
+                            updateGallery({ price_cents: Math.round(dollars * 100) });
+                          }
+                        }}
+                      />
+                    </div>
+                    <p style={s.fieldHelp}>Default is $549. Make sure this covers prints + box + shipping + Stripe fee with margin.</p>
                   </div>
                 </div>
               </>
@@ -829,11 +893,93 @@ export default function GalleryEditor() {
                 )}
               </>
             )}
+
+            {tab === 'orders' && (
+              <div style={s.card}>
+                <div style={s.cardHead}>
+                  <div style={s.cardEyebrow}>Orders</div>
+                  <div style={s.cardTitle}>
+                    {orders.length === 0
+                      ? 'No orders yet'
+                      : `${orders.length} order${orders.length === 1 ? '' : 's'} placed`}
+                  </div>
+                  <p style={s.cardHelp}>
+                    Customers see the &quot;Order — ${(gallery.price_cents / 100).toFixed(0)}&quot; pill on the gallery.
+                    Paid orders show below with full shipping details. Mark fulfilled when you've shipped the box.
+                  </p>
+                </div>
+                {orders.length > 0 && (
+                  <div style={s.orderList}>
+                    {orders.map(o => {
+                      const dollars = `$${(o.amount_cents / 100).toFixed(2)}`;
+                      const date = new Date(o.created_at).toLocaleString();
+                      const shipLines = [
+                        o.shipping_name,
+                        o.shipping_address_line1,
+                        o.shipping_address_line2,
+                        [o.shipping_city, o.shipping_state, o.shipping_postal_code].filter(Boolean).join(', '),
+                        o.shipping_country,
+                      ].filter(Boolean);
+                      return (
+                        <div key={o.id} style={s.orderItem}>
+                          <div style={s.orderItemHead}>
+                            <div>
+                              <div style={s.orderItemTop}>
+                                <span style={{ ...s.orderStatus, ...statusStyle(o.status) }}>{o.status}</span>
+                                <span style={s.orderAmount}>{dollars}</span>
+                              </div>
+                              <div style={s.orderDate}>{date}</div>
+                            </div>
+                            {o.status === 'paid' && (
+                              <button
+                                type="button"
+                                style={s.markFulfilledBtn}
+                                onClick={() => markOrderFulfilled(o.id)}
+                              >
+                                Mark fulfilled
+                              </button>
+                            )}
+                          </div>
+                          {(o.customer_name || o.customer_email) && (
+                            <div style={s.orderField}>
+                              <div style={s.orderFieldLabel}>Customer</div>
+                              <div style={s.orderFieldValue}>
+                                {o.customer_name}
+                                {o.customer_email && <div style={{ color: 'var(--text-muted)' }}>{o.customer_email}</div>}
+                              </div>
+                            </div>
+                          )}
+                          {shipLines.length > 0 && (
+                            <div style={s.orderField}>
+                              <div style={s.orderFieldLabel}>Ship to</div>
+                              <div style={s.orderFieldValue}>
+                                {shipLines.map((l, i) => <div key={i}>{l}</div>)}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </main>
         </>
       )}
     </div>
   );
+}
+
+function statusStyle(status: string): React.CSSProperties {
+  switch (status) {
+    case 'paid': return { background: 'var(--success)', color: '#1a1613' };
+    case 'fulfilled': return { background: 'var(--surface-elevated)', color: 'var(--text)' };
+    case 'pending': return { background: 'var(--surface-2)', color: 'var(--text-muted)' };
+    case 'cancelled':
+    case 'refunded': return { background: 'var(--danger-bg)', color: 'var(--danger)' };
+    default: return { background: 'var(--surface-2)', color: 'var(--text-muted)' };
+  }
 }
 
 const s: Record<string, React.CSSProperties> = {
@@ -1133,6 +1279,82 @@ const s: Record<string, React.CSSProperties> = {
     gap: '2px',
     marginBottom: '20px',
     flexWrap: 'wrap' as const,
+  },
+  orderList: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '14px',
+  },
+  orderItem: {
+    border: '1px solid var(--border-soft)',
+    borderRadius: '8px',
+    padding: '18px 20px',
+    background: 'var(--input-bg)',
+  },
+  orderItemHead: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: '16px',
+    marginBottom: '14px',
+  },
+  orderItemTop: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '4px',
+  },
+  orderStatus: {
+    fontSize: '11px',
+    letterSpacing: '1px',
+    textTransform: 'uppercase' as const,
+    padding: '3px 8px',
+    borderRadius: '999px',
+    fontWeight: 500,
+  },
+  orderAmount: {
+    fontSize: '15px',
+    fontWeight: 500,
+    color: 'var(--text)',
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+  },
+  orderDate: {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+  },
+  markFulfilledBtn: {
+    padding: '6px 12px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: 'var(--text-2)',
+    background: 'transparent',
+    border: '1px solid var(--border)',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+    flexShrink: 0,
+  },
+  orderField: {
+    display: 'flex',
+    gap: '14px',
+    fontSize: '13px',
+    paddingTop: '8px',
+    borderTop: '1px solid var(--border-soft)',
+    marginTop: '8px',
+  },
+  orderFieldLabel: {
+    width: '80px',
+    color: 'var(--text-muted)',
+    fontSize: '11px',
+    letterSpacing: '0.5px',
+    textTransform: 'uppercase' as const,
+    flexShrink: 0,
+    paddingTop: '2px',
+  },
+  orderFieldValue: {
+    color: 'var(--text)',
+    lineHeight: 1.5,
+    flex: 1,
   },
   sidebar: {
     width: '200px',
