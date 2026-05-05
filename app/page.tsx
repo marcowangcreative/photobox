@@ -15,7 +15,7 @@ export default function Home() {
         </p>
 
         <div style={s.actions}>
-          <a href="/g/demo" style={s.btn}>View Demo</a>
+          <a href="/g/chloeandjett" style={s.btn}>View Demo</a>
           <a href="/admin" style={s.btnOutline}>Admin</a>
         </div>
       </div>
