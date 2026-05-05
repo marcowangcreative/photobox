@@ -1641,7 +1641,6 @@ const st: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '20px',
-    animation: 'fadeIn 0.2s ease',
   },
   modalCard: {
     position: 'relative',
@@ -1654,9 +1653,8 @@ const st: Record<string, React.CSSProperties> = {
     maxHeight: '90vh',
     overflowY: 'auto',
     fontFamily: 'var(--font-sans)',
-    color: 'var(--text)',
+    color: 'var(--text-2)',
     boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3)',
-    animation: 'fadeIn 0.25s ease',
   },
   modalClose: {
     position: 'absolute',
@@ -1687,7 +1685,7 @@ const st: Record<string, React.CSSProperties> = {
     fontStyle: 'italic',
     fontSize: 30,
     fontWeight: 400,
-    color: 'var(--text)',
+    color: 'var(--text-2)',
     letterSpacing: '0.5px',
     margin: 0,
     marginBottom: 14,
@@ -1768,7 +1766,7 @@ const st: Record<string, React.CSSProperties> = {
   modalPriceValue: {
     fontSize: 24,
     fontWeight: 500,
-    color: 'var(--text)',
+    color: 'var(--text-2)',
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
     letterSpacing: '-0.5px',
   },
