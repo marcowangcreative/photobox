@@ -80,6 +80,15 @@ function SendIcon() {
   );
 }
 
+function BagIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 7h12l-1 13H7L6 7z" />
+      <path d="M9 7a3 3 0 1 1 6 0" />
+    </svg>
+  );
+}
+
 function CheckIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -183,10 +192,11 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
       <button
         type="button"
         onClick={() => setOrderModalOpen(true)}
-        style={st.orderPill}
-        title="Order this curated print box"
+        style={st.orderToggle}
+        aria-label={`Order this print box — ${priceLabel}`}
+        title={`Order this print box — ${priceLabel}`}
       >
-        Order — {priceLabel}
+        <BagIcon />
       </button>
       {orderModalOpen && (
         <div style={st.modalBackdrop} onClick={() => setOrderModalOpen(false)}>
@@ -1470,25 +1480,22 @@ const st: Record<string, React.CSSProperties> = {
     zIndex: 55,
     transition: 'background 0.2s',
   },
-  orderPill: {
+  orderToggle: {
     position: 'fixed',
     top: 18,
     right: 22,
-    zIndex: 60,
-    padding: '9px 16px',
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: '0.5px',
-    color: 'var(--text)',
-    background: 'var(--surface)',
-    border: '1px solid var(--border)',
-    borderRadius: 999,
+    width: 36,
+    height: 36,
+    borderRadius: '50%',
+    background: 'var(--toggle-bg)',
+    border: '1px solid var(--toggle-border)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     cursor: 'pointer',
-    fontFamily: 'var(--font-sans)',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-    backdropFilter: 'saturate(180%) blur(8px)',
-    WebkitBackdropFilter: 'saturate(180%) blur(8px)',
-    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+    padding: 0,
+    zIndex: 60,
+    transition: 'background 0.2s',
   },
   orderBannerSuccess: {
     position: 'fixed',
