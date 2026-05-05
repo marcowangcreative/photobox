@@ -22,6 +22,8 @@ interface Props {
   titleColor?: string | null;
   printBrightness?: number | null;
   fontPreset?: 'editorial' | 'romantic' | 'modern' | null;
+  galleryId: string;
+  priceCents: number;
 }
 
 // Shift a #rrggbb color toward black (amount < 0) or white (amount > 0).
@@ -108,7 +110,72 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, printBrightness, fontPreset }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, printBrightness, fontPreset, galleryId, priceCents }: Props) {
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderBanner, setOrderBanner] = useState<'success' | 'cancelled' | null>(null);
+
+  const startCheckout = useCallback(async () => {
+    if (orderLoading) return;
+    setOrderLoading(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gallery_id: galleryId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setOrderLoading(false);
+        alert(data.error || 'Could not start checkout. Please try again.');
+      }
+    } catch {
+      setOrderLoading(false);
+      alert('Network error. Please try again.');
+    }
+  }, [galleryId, orderLoading]);
+
+  const priceLabel = `$${(priceCents / 100).toFixed(0)}`;
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    if (status === 'success' || status === 'cancelled') {
+      setOrderBanner(status);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('order');
+      url.searchParams.delete('status');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
+
+  const orderOverlay = (
+    <>
+      {orderBanner && (
+        <div
+          style={orderBanner === 'success' ? st.orderBannerSuccess : st.orderBannerCancelled}
+          onClick={() => setOrderBanner(null)}
+          role="button"
+          tabIndex={0}
+        >
+          {orderBanner === 'success'
+            ? `Thank you — your order is in. Check your inbox for a receipt.`
+            : `Order cancelled. No charge was made.`}
+          <span style={st.orderBannerClose}>×</span>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={startCheckout}
+        disabled={orderLoading}
+        style={st.orderPill}
+        title="Order this curated print box"
+      >
+        {orderLoading ? 'Loading…' : `Order — ${priceLabel}`}
+      </button>
+    </>
+  );
   const sceneOverrides: Record<string, string> = {};
   if (boxColor) {
     sceneOverrides['--tray-outer'] = boxColor;
@@ -457,6 +524,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     return (
       <div style={sceneStyle}>
         <style>{baseStyles}</style>
+        {orderOverlay}
         <div style={st.header}>
           <h1 style={st.title}>{coupleNames}</h1>
         </div>
@@ -535,6 +603,23 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               })}
             </div>
           )}
+          {photos.length > 0 && (
+            <div style={st.orderHero}>
+              <div style={st.orderHeroEyebrow}>One curated keepsake box</div>
+              <div style={st.orderHeroTitle}>{coupleNames}</div>
+              <div style={st.orderHeroDesc}>
+                A printed, hand-curated photobox of these prints — shipped to your door.
+              </div>
+              <button
+                type="button"
+                style={st.orderHeroBtn}
+                onClick={startCheckout}
+                disabled={orderLoading}
+              >
+                {orderLoading ? 'Loading…' : `Order this box — ${priceLabel}`}
+              </button>
+            </div>
+          )}
         </div>
         <div style={st.modeToggle} onClick={() => setMode('stack')} role="button" tabIndex={0}>
           <StackIcon />
@@ -594,6 +679,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   return (
     <div style={sceneStyle}>
       <style>{baseStyles}</style>
+      {orderOverlay}
 
       <div style={{
         ...st.stackWorkspace,
@@ -672,6 +758,21 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               )}
             </div>
           </div>
+
+          {unseenCount === 0 && phase === 'idle' && (
+            <div style={st.orderHeroBoxMode}>
+              <div style={st.orderHeroEyebrow}>Take it home</div>
+              <button
+                type="button"
+                style={st.orderHeroBtn}
+                onClick={startCheckout}
+                disabled={orderLoading}
+              >
+                {orderLoading ? 'Loading…' : `Order this box — ${priceLabel}`}
+              </button>
+              <div style={st.orderHeroSub}>Hand-curated, printed, shipped to your door.</div>
+            </div>
+          )}
 
           {/* Lid */}
           {lidState !== 'open' && (
@@ -1286,5 +1387,133 @@ const st: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     zIndex: 55,
     transition: 'background 0.2s',
+  },
+  orderPill: {
+    position: 'fixed',
+    top: 18,
+    right: 22,
+    zIndex: 60,
+    padding: '9px 16px',
+    fontSize: 13,
+    fontWeight: 500,
+    letterSpacing: '0.5px',
+    color: 'var(--text)',
+    background: 'var(--surface)',
+    border: '1px solid var(--border)',
+    borderRadius: 999,
+    cursor: 'pointer',
+    fontFamily: 'var(--font-sans)',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+    backdropFilter: 'saturate(180%) blur(8px)',
+    WebkitBackdropFilter: 'saturate(180%) blur(8px)',
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+  },
+  orderBannerSuccess: {
+    position: 'fixed',
+    top: 18,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 80,
+    padding: '12px 18px',
+    fontSize: 13,
+    color: '#1a1613',
+    background: 'var(--success)',
+    borderRadius: 999,
+    fontFamily: 'var(--font-sans)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+    maxWidth: '90vw',
+  },
+  orderBannerCancelled: {
+    position: 'fixed',
+    top: 18,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 80,
+    padding: '12px 18px',
+    fontSize: 13,
+    color: 'var(--text)',
+    background: 'var(--surface)',
+    border: '1px solid var(--border)',
+    borderRadius: 999,
+    fontFamily: 'var(--font-sans)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+    maxWidth: '90vw',
+  },
+  orderBannerClose: {
+    fontSize: 18,
+    opacity: 0.6,
+    lineHeight: 1,
+  },
+  orderHero: {
+    width: '100%',
+    maxWidth: '520px',
+    margin: '64px auto 32px',
+    padding: '40px 32px',
+    textAlign: 'center',
+    background: 'var(--surface)',
+    border: '1px solid var(--border-soft)',
+    borderRadius: '8px',
+    boxShadow: 'var(--shadow-card)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  orderHeroBoxMode: {
+    marginTop: '36px',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  orderHeroEyebrow: {
+    fontFamily: 'var(--font-sans)',
+    fontSize: '11px',
+    letterSpacing: '2px',
+    textTransform: 'uppercase',
+    color: 'var(--text-muted)',
+  },
+  orderHeroTitle: {
+    fontFamily: 'var(--font-serif)',
+    fontStyle: 'italic',
+    fontSize: '26px',
+    color: 'var(--text)',
+    letterSpacing: '1px',
+  },
+  orderHeroDesc: {
+    fontFamily: 'var(--font-sans)',
+    fontSize: '14px',
+    lineHeight: 1.5,
+    color: 'var(--text-muted)',
+    maxWidth: '380px',
+  },
+  orderHeroSub: {
+    fontFamily: 'var(--font-sans)',
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+    letterSpacing: '0.3px',
+  },
+  orderHeroBtn: {
+    marginTop: '8px',
+    padding: '14px 28px',
+    fontSize: '14px',
+    fontWeight: 500,
+    letterSpacing: '0.5px',
+    color: 'var(--accent-fg)',
+    background: 'var(--accent)',
+    border: 'none',
+    borderRadius: '999px',
+    cursor: 'pointer',
+    fontFamily: 'var(--font-sans)',
+    boxShadow: '0 4px 18px rgba(0,0,0,0.18)',
   },
 };
