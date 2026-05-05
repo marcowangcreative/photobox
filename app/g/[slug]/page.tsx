@@ -67,6 +67,8 @@ export default async function GalleryPage({ params }: Props) {
       titleColor={gallery.title_color}
       printBrightness={gallery.print_brightness}
       fontPreset={gallery.font_preset}
+      galleryId={gallery.id}
+      priceCents={gallery.price_cents ?? 54900}
     />
   );
 }
