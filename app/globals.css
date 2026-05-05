@@ -29,6 +29,8 @@
   --font-serif: 'Playfair Display', serif;
   --font-sans: 'DM Sans', sans-serif;
 
+  --logo-invert: 1;
+
   --border: #3a342d;
   --border-soft: #2a241e;
 
@@ -143,6 +145,8 @@
   --shadow-lg: 0 12px 60px rgba(60,50,35,0.15), 0 4px 20px rgba(60,50,35,0.08);
   --shadow-card: 0 4px 24px rgba(60,50,35,0.15);
   --shadow-stacked: 0 1px 3px rgba(60,50,35,0.15);
+
+  --logo-invert: 0;
 }
 
 html, body {

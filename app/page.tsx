@@ -9,9 +9,9 @@ export default function Home() {
       `}</style>
 
       <div style={s.content}>
-        <h1 style={s.title}>Photobox</h1>
+        <img src="/photokase-logo.png" alt="Photokase" style={s.logo} />
         <p style={s.sub}>
-          Wedding galleries that feel like opening a box of prints.
+          Wedding sneak peeks delivered as a curated keepsake — a tactile box of hand-picked prints, with the option to order the real thing.
         </p>
 
         <div style={s.actions}>
@@ -40,13 +40,11 @@ const s: Record<string, React.CSSProperties> = {
     textAlign: 'center' as const,
     padding: '40px',
   },
-  title: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: '48px',
-    fontWeight: 400,
-    color: 'var(--text)',
-    letterSpacing: '4px',
-    marginBottom: '12px',
+  logo: {
+    width: 'min(420px, 70vw)',
+    height: 'auto',
+    marginBottom: '20px',
+    filter: 'invert(var(--logo-invert))',
   },
   sub: {
     fontSize: '16px',
