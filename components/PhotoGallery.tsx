@@ -845,27 +845,25 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                   ) : null}
                 </div>
               ) : (
-                <div style={st.doneState} onClick={resetGallery} role="button" tabIndex={0}>
-                  <p style={st.doneAction}>start over</p>
+                <div style={st.doneState}>
+                  <button
+                    type="button"
+                    style={st.doneCta}
+                    onClick={() => setOrderModalOpen(true)}
+                  >
+                    Order this box
+                  </button>
+                  <button
+                    type="button"
+                    style={st.doneStartOver}
+                    onClick={resetGallery}
+                  >
+                    or start over
+                  </button>
                 </div>
               )}
             </div>
           </div>
-
-          {unseenCount === 0 && phase === 'idle' && (
-            <div style={st.orderHeroBoxMode}>
-              <div style={st.orderHeroEyebrow}>Take it home</div>
-              <button
-                type="button"
-                style={st.orderHeroBtn}
-                onClick={() => setOrderModalOpen(true)}
-                disabled={orderLoading}
-              >
-                {orderLoading ? 'Loading…' : `Order this box — ${priceLabel}`}
-              </button>
-              <div style={st.orderHeroSub}>Hand-curated, printed, shipped to your door.</div>
-            </div>
-          )}
 
           {/* Lid */}
           {lidState !== 'open' && (
@@ -1232,8 +1230,33 @@ const st: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    cursor: 'pointer',
+    gap: '14px',
     padding: '20px',
+  },
+  doneCta: {
+    padding: '10px 18px',
+    fontSize: '12px',
+    fontWeight: 500,
+    letterSpacing: '1.2px',
+    textTransform: 'uppercase',
+    color: 'var(--accent-fg)',
+    background: 'var(--accent)',
+    border: 'none',
+    borderRadius: '999px',
+    cursor: 'pointer',
+    fontFamily: 'var(--font-sans)',
+    boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+  },
+  doneStartOver: {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '10px',
+    fontFamily: 'var(--font-sans)',
+    color: 'var(--text-muted)',
+    letterSpacing: '2px',
+    textTransform: 'uppercase',
+    fontWeight: 300,
   },
   doneAction: {
     fontSize: '11px',
