@@ -1033,7 +1033,7 @@ const st: Record<string, React.CSSProperties> = {
   },
   header: {
     textAlign: 'center',
-    padding: '32px 20px 0',
+    padding: '70px 20px 0',
     zIndex: 2,
   },
   title: {
@@ -1362,8 +1362,8 @@ const st: Record<string, React.CSSProperties> = {
   },
   modeToggle: {
     position: 'fixed',
-    top: '156px',
-    left: '22px',
+    top: '18px',
+    left: '160px',
     width: '36px',
     height: '36px',
     borderRadius: '50%',
@@ -1378,8 +1378,8 @@ const st: Record<string, React.CSSProperties> = {
   },
   shareToggle: {
     position: 'fixed',
-    top: '110px',
-    left: '22px',
+    top: '18px',
+    left: '114px',
     width: '36px',
     height: '36px',
     borderRadius: '50%',
@@ -1507,8 +1507,8 @@ const st: Record<string, React.CSSProperties> = {
   },
   orderToggle: {
     position: 'fixed',
-    top: 64,
-    left: 22,
+    top: 18,
+    left: 68,
     width: 36,
     height: 36,
     borderRadius: '50%',
