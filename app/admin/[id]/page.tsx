@@ -338,7 +338,6 @@ interface Gallery {
   sneak_peek_color: string | null;
   felt_color: string | null;
   title_color: string | null;
-  paper_color: string | null;
   print_brightness: number | null;
   font_preset: 'editorial' | 'romantic' | 'modern' | null;
 }
@@ -664,8 +663,6 @@ export default function GalleryEditor() {
                       onChange={v => updateGallery({ sneak_peek_color: v })} />
                     <ColorRow label="Grid title" value={gallery.title_color} placeholder="#1a1613"
                       onChange={v => updateGallery({ title_color: v })} />
-                    <ColorRow label="Photo paper (frame)" value={gallery.paper_color} placeholder="#f5f0e8"
-                      onChange={v => updateGallery({ paper_color: v })} />
                     <SliderRow label="Top photo darken"
                       value={gallery.print_brightness ?? 0.92}
                       isCustom={gallery.print_brightness != null}
@@ -703,7 +700,7 @@ export default function GalleryEditor() {
                     textColor={gallery.text_color || 'var(--text)'}
                     sneakPeekColor={gallery.sneak_peek_color || 'var(--text-muted)'}
                     titleColor={gallery.title_color || 'var(--title)'}
-                    paperColor={gallery.paper_color || 'var(--print-bg)'}
+                    paperColor="var(--print-bg)"
                     printBrightness={gallery.print_brightness ?? 0.92}
                     hasFeltOverride={!!gallery.felt_color}
                     fontSerif={activePreset.serif}

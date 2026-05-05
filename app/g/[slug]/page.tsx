@@ -65,7 +65,6 @@ export default async function GalleryPage({ params }: Props) {
       sneakPeekColor={gallery.sneak_peek_color}
       feltColor={gallery.felt_color}
       titleColor={gallery.title_color}
-      paperColor={gallery.paper_color}
       printBrightness={gallery.print_brightness}
       fontPreset={gallery.font_preset}
     />

@@ -20,7 +20,6 @@ interface Props {
   sneakPeekColor?: string | null;
   feltColor?: string | null;
   titleColor?: string | null;
-  paperColor?: string | null;
   printBrightness?: number | null;
   fontPreset?: 'editorial' | 'romantic' | 'modern' | null;
 }
@@ -109,7 +108,7 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, paperColor, printBrightness, fontPreset }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, printBrightness, fontPreset }: Props) {
   const sceneOverrides: Record<string, string> = {};
   if (boxColor) {
     sceneOverrides['--tray-outer'] = boxColor;
@@ -131,9 +130,6 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   }
   if (titleColor) {
     sceneOverrides['--title'] = titleColor;
-  }
-  if (paperColor) {
-    sceneOverrides['--print-bg'] = paperColor;
   }
   if (printBrightness != null) {
     sceneOverrides['--print-img-brightness'] = String(printBrightness);
