@@ -354,6 +354,7 @@ export default function GalleryEditor() {
   const router = useRouter();
   const [gallery, setGallery] = useState<Gallery | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [tab, setTab] = useState<'details' | 'design' | 'photos'>('details');
   const [uploading, setUploading] = useState(false);
   const [uploadCurrent, setUploadCurrent] = useState(0);
   const [uploadTotal, setUploadTotal] = useState(0);
@@ -507,8 +508,8 @@ export default function GalleryEditor() {
     saveOrder(updated);
   }
 
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
   const uploadPct = uploadTotal > 0 ? Math.round((uploadCurrent / uploadTotal) * 100) : 0;
+  const activePreset = FONT_PRESET_LIST.find(p => p.key === (gallery?.font_preset || 'editorial'))!;
 
   return (
     <div style={s.page}>
@@ -516,254 +517,324 @@ export default function GalleryEditor() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&family=Fraunces:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); }
+        input:focus, textarea:focus { border-color: var(--accent) !important; }
       `}</style>
 
-      <div style={s.container}>
-        <button style={s.backBtn} onClick={() => router.push('/admin')}>← Back</button>
-
-        {gallery && (
-          <>
-            <div style={s.topRow}>
-              <div style={s.fields}>
-                <label style={s.label}>Couple Names</label>
-                <input
-                  style={s.input}
-                  value={gallery.couple_names}
-                  onChange={e => updateGallery({ couple_names: e.target.value })}
-                />
-                <label style={{ ...s.label, marginTop: '12px' }}>Lid Label</label>
-                <input
-                  style={s.input}
-                  value={gallery.sneak_peek_label}
-                  onChange={e => updateGallery({ sneak_peek_label: e.target.value })}
-                />
-                <label style={{ ...s.label, marginTop: '12px' }}>URL Slug</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ ...s.label, marginTop: 0, color: 'var(--text-muted)' }}>/g/</span>
-                  <input
-                    style={s.input}
-                    value={gallery.slug}
-                    onChange={e => updateGallery({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') })}
-                  />
-                </div>
-                <label style={{ ...s.label, marginTop: '12px' }}>Grid Style</label>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {[
-                    { key: 'stacked', label: 'Stacked' },
-                    { key: 'clean', label: 'Clean Grid' },
-                  ].map(opt => (
-                    <button
-                      key={opt.key}
-                      style={{
-                        ...s.sortBtn,
-                        ...(gallery.grid_style === opt.key ? s.sortBtnActive : {}),
-                      }}
-                      onClick={() => updateGallery({ grid_style: opt.key as Gallery['grid_style'] })}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+      {gallery && (
+        <>
+          {/* Sticky topbar */}
+          <header style={s.topbar}>
+            <div style={s.topbarInner}>
+              <button style={s.crumb} onClick={() => router.push('/admin')}>
+                <span style={{ fontSize: '14px' }}>‹</span>
+                <span>All galleries</span>
+              </button>
+              <div style={s.topbarTitleWrap}>
+                <h1 style={s.topbarTitle}>{gallery.couple_names || 'Untitled gallery'}</h1>
+                <div style={s.topbarMeta}>
+                  <span style={s.slugPill}>/g/{gallery.slug}</span>
+                  {saving && <span style={s.savingDot}>saving…</span>}
                 </div>
               </div>
-              <div style={s.sidebar}>
-                <div style={s.linkBox}>
-                  <span style={s.linkLabel}>Gallery link</span>
-                  <a style={s.link} href={`/g/${gallery.slug}`} target="_blank" rel="noopener noreferrer">
-                    /g/{gallery.slug}
-                  </a>
-                </div>
+              <div style={s.topbarActions}>
+                <a
+                  href={`/g/${gallery.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={s.ghostBtn}
+                >
+                  View live ↗
+                </a>
                 <button
                   style={{
-                    ...s.btn,
-                    background: gallery.is_published ? 'var(--success)' : 'var(--accent)',
-                    color: gallery.is_published ? '#1a1613' : 'var(--accent-fg)',
-                    width: '100%',
+                    ...s.primaryBtn,
+                    ...(gallery.is_published ? s.primaryBtnLive : {}),
                   }}
                   onClick={() => updateGallery({ is_published: !gallery.is_published })}
                 >
                   {gallery.is_published ? '● Live' : 'Publish'}
                 </button>
-                <div style={s.photoCount}>
-                  {photos.length} photo{photos.length !== 1 ? 's' : ''}
-                  {saving && <span style={s.savingBadge}> saving...</span>}
-                </div>
               </div>
             </div>
+            <nav style={s.tabsRow}>
+              {[
+                { key: 'details', label: 'Details' },
+                { key: 'design',  label: 'Design' },
+                { key: 'photos',  label: `Photos${photos.length ? ` · ${photos.length}` : ''}` },
+              ].map(t => (
+                <button
+                  key={t.key}
+                  style={{ ...s.tab, ...(tab === t.key ? s.tabActive : {}) }}
+                  onClick={() => setTab(t.key as typeof tab)}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </nav>
+          </header>
 
-            {/* Theme panel */}
-            <div style={s.themePanel}>
-              <div style={s.themeRows}>
-                <ColorRow label="Box exterior" value={gallery.box_color} placeholder="#2a241e"
-                  onChange={v => updateGallery({ box_color: v })} />
-                <ColorRow label="Box interior (felt)" value={gallery.felt_color} placeholder="#0a0806"
-                  onChange={v => updateGallery({ felt_color: v })} />
-                <ColorRow label="Couple names (lid)" value={gallery.text_color} placeholder="#ece3d1"
-                  onChange={v => updateGallery({ text_color: v })} />
-                <ColorRow label="Sneak-peek label (lid)" value={gallery.sneak_peek_color} placeholder="#a0958a"
-                  onChange={v => updateGallery({ sneak_peek_color: v })} />
-                <ColorRow label="Grid title" value={gallery.title_color} placeholder="#1a1613"
-                  onChange={v => updateGallery({ title_color: v })} />
-                <ColorRow label="Photo paper (frame)" value={gallery.paper_color} placeholder="#f5f0e8"
-                  onChange={v => updateGallery({ paper_color: v })} />
-                <SliderRow label="Top photo darken"
-                  value={gallery.print_brightness ?? 0.92}
-                  isCustom={gallery.print_brightness != null}
-                  min={0.85} max={1.0} step={0.01}
-                  format={n => `${Math.round((1 - n) * 100)}%`}
-                  onChange={n => updateGallery({ print_brightness: n })}
-                  onReset={() => updateGallery({ print_brightness: null })}
-                />
-                <div style={{ padding: '10px 0 4px', borderTop: '1px solid var(--border-soft)', marginTop: '8px' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-2)', marginBottom: '8px' }}>Font pairing</div>
-                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                    {FONT_PRESET_LIST.map(p => {
-                      const active = (gallery.font_preset || 'editorial') === p.key;
-                      return (
-                        <button
-                          key={p.key}
-                          type="button"
-                          onClick={() => updateGallery({ font_preset: p.key })}
-                          style={{
-                            ...s.sortBtn,
-                            ...(active ? s.sortBtnActive : {}),
-                            display: 'flex', flexDirection: 'column',
-                            alignItems: 'center', gap: '2px',
-                            padding: '6px 12px', minWidth: '78px',
-                          }}
-                        >
-                          <span style={{ fontSize: '11px', letterSpacing: '0.5px' }}>{p.label}</span>
-                          <span style={{ fontFamily: p.serif, fontStyle: 'italic', fontSize: '13px', lineHeight: 1 }}>Aa</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-              <BoxPreview
-                boxColor={gallery.box_color || 'var(--tray-outer)'}
-                feltColor={gallery.felt_color || '#100c08'}
-                textColor={gallery.text_color || 'var(--text)'}
-                sneakPeekColor={gallery.sneak_peek_color || 'var(--text-muted)'}
-                titleColor={gallery.title_color || 'var(--title)'}
-                paperColor={gallery.paper_color || 'var(--print-bg)'}
-                printBrightness={gallery.print_brightness ?? 0.92}
-                hasFeltOverride={!!gallery.felt_color}
-                fontSerif={FONT_PRESET_LIST.find(p => p.key === (gallery.font_preset || 'editorial'))!.serif}
-                fontSans={FONT_PRESET_LIST.find(p => p.key === (gallery.font_preset || 'editorial'))!.sans}
-                coupleNames={gallery.couple_names}
-                sneakPeekLabel={gallery.sneak_peek_label}
-              />
-            </div>
-
-            {/* Upload zone */}
-            <div
-              style={{
-                ...s.dropZone,
-                borderColor: dragOver ? 'var(--accent)' : 'var(--border)',
-                background: dragOver ? 'var(--toggle-bg)' : 'transparent',
-              }}
-              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleFileDrop}
-              onClick={() => !uploading && fileInputRef.current?.click()}
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/jpeg,image/png,image/webp"
-                style={{ display: 'none' }}
-                onChange={e => e.target.files && uploadFiles(e.target.files)}
-              />
-              {uploading ? (
-                <div>
-                  <p style={s.dropText}>{uploadCurrent} of {uploadTotal}</p>
-                  <div style={s.progressBar}>
-                    <div style={{ ...s.progressFill, width: `${uploadPct}%` }} />
-                  </div>
-                  {uploadFailed.length > 0 && (
-                    <p style={s.failedText}>{uploadFailed.length} failed</p>
-                  )}
-                  <button
-                    style={{ ...s.btnSmall, marginTop: '12px' }}
-                    onClick={(e) => { e.stopPropagation(); abortRef.current = true; }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <p style={s.dropText}>Drop photos here or click to upload</p>
-                  <p style={s.dropSub}>JPEG, PNG, WebP — handles 100+ photos, uploaded one at a time</p>
-                </>
-              )}
-            </div>
-
-            {/* Thumbnail grid */}
-            {photos.length > 0 && (
+          <main style={s.main}>
+            {tab === 'details' && (
               <>
-                <div style={s.sortBar}>
-                  <span style={s.sortLabel}>Sort by</span>
-                  <div style={s.sortOptions}>
+                <div style={s.card}>
+                  <div style={s.cardHead}>
+                    <div style={s.cardEyebrow}>Identity</div>
+                    <div style={s.cardTitle}>How this gallery is named</div>
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.fieldLabel}>Couple names</label>
+                    <input
+                      style={s.input}
+                      value={gallery.couple_names}
+                      onChange={e => updateGallery({ couple_names: e.target.value })}
+                    />
+                    <p style={s.fieldHelp}>Shown on the box lid and as the gallery title.</p>
+                  </div>
+                  <div style={s.field}>
+                    <label style={s.fieldLabel}>Lid label</label>
+                    <input
+                      style={s.input}
+                      value={gallery.sneak_peek_label}
+                      onChange={e => updateGallery({ sneak_peek_label: e.target.value })}
+                    />
+                    <p style={s.fieldHelp}>The line under the names on the box lid (e.g. "sneak peeks", "first looks").</p>
+                  </div>
+                </div>
+
+                <div style={s.card}>
+                  <div style={s.cardHead}>
+                    <div style={s.cardEyebrow}>Link</div>
+                    <div style={s.cardTitle}>Gallery URL</div>
+                  </div>
+                  <div style={s.field}>
+                    <div style={s.slugInputRow}>
+                      <span style={s.slugPrefix}>/g/</span>
+                      <input
+                        style={{ ...s.input, ...s.slugInput }}
+                        value={gallery.slug}
+                        onChange={e => updateGallery({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') })}
+                      />
+                    </div>
+                    <p style={s.fieldHelp}>Lowercase letters and numbers only. Changing this breaks any links you've already shared.</p>
+                  </div>
+                </div>
+
+                <div style={s.card}>
+                  <div style={s.cardHead}>
+                    <div style={s.cardEyebrow}>Layout</div>
+                    <div style={s.cardTitle}>Grid style</div>
+                  </div>
+                  <div style={s.segGroup}>
                     {[
-                      { key: 'custom', label: 'Custom' },
-                      { key: 'name-asc', label: 'Name A→Z' },
-                      { key: 'name-desc', label: 'Name Z→A' },
-                      { key: 'time-asc', label: 'Oldest first' },
-                      { key: 'time-desc', label: 'Newest first' },
+                      { key: 'stacked', label: 'Stacked' },
+                      { key: 'clean', label: 'Clean grid' },
                     ].map(opt => (
                       <button
                         key={opt.key}
                         style={{
-                          ...s.sortBtn,
-                          ...(sortMode === opt.key ? s.sortBtnActive : {}),
+                          ...s.segBtn,
+                          ...(gallery.grid_style === opt.key ? s.segBtnActive : {}),
                         }}
-                        onClick={() => applySortMode(opt.key as typeof sortMode)}
+                        onClick={() => updateGallery({ grid_style: opt.key as Gallery['grid_style'] })}
                       >
                         {opt.label}
                       </button>
                     ))}
                   </div>
                 </div>
-                {sortMode === 'custom' && (
-                  <p style={s.reorderHint}>Drag to reorder. First photo shows on top of the stack.</p>
-                )}
-                <div style={s.photoGrid}>
-                  {photos.map((photo, idx) => (
-                    <div
-                      key={photo.id}
-                      style={{
-                        ...s.photoCard,
-                        opacity: dragIdx === idx ? 0.4 : 1,
-                        outline: dropIdx === idx ? '2px solid var(--accent)' : 'none',
-                        cursor: sortMode === 'custom' ? 'grab' : 'default',
-                      }}
-                      draggable={sortMode === 'custom'}
-                      onDragStart={() => sortMode === 'custom' && handleDragStart(idx)}
-                      onDragOver={e => sortMode === 'custom' && handleDragOver(e, idx)}
-                      onDrop={() => sortMode === 'custom' && handleDropReorder(idx)}
-                      onDragEnd={() => { setDragIdx(null); setDropIdx(null); }}
-                    >
-                      <img src={photo.url} alt={photo.filename} style={s.photoThumb} />
-                      <div style={s.photoOverlay}>
-                        <span style={s.photoTag}>
-                          {idx + 1} · {photo.is_landscape ? 'L' : 'P'}
-                        </span>
-                        <button
-                          style={s.deleteBtn}
-                          onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </>
             )}
-          </>
-        )}
-      </div>
+
+            {tab === 'design' && (
+              <div style={s.card}>
+                <div style={s.cardHead}>
+                  <div style={s.cardEyebrow}>Theme</div>
+                  <div style={s.cardTitle}>Box, type, and prints</div>
+                  <p style={s.cardHelp}>Tweak each color and watch the preview update. Reset (✕) returns any control to the platform default.</p>
+                </div>
+                <div style={s.themePanelV2}>
+                  <div style={s.themeRows}>
+                    <ColorRow label="Box exterior" value={gallery.box_color} placeholder="#2a241e"
+                      onChange={v => updateGallery({ box_color: v })} />
+                    <ColorRow label="Box interior (felt)" value={gallery.felt_color} placeholder="#0a0806"
+                      onChange={v => updateGallery({ felt_color: v })} />
+                    <ColorRow label="Couple names (lid)" value={gallery.text_color} placeholder="#ece3d1"
+                      onChange={v => updateGallery({ text_color: v })} />
+                    <ColorRow label="Sneak-peek label (lid)" value={gallery.sneak_peek_color} placeholder="#a0958a"
+                      onChange={v => updateGallery({ sneak_peek_color: v })} />
+                    <ColorRow label="Grid title" value={gallery.title_color} placeholder="#1a1613"
+                      onChange={v => updateGallery({ title_color: v })} />
+                    <ColorRow label="Photo paper (frame)" value={gallery.paper_color} placeholder="#f5f0e8"
+                      onChange={v => updateGallery({ paper_color: v })} />
+                    <SliderRow label="Top photo darken"
+                      value={gallery.print_brightness ?? 0.92}
+                      isCustom={gallery.print_brightness != null}
+                      min={0.85} max={1.0} step={0.01}
+                      format={n => `${Math.round((1 - n) * 100)}%`}
+                      onChange={n => updateGallery({ print_brightness: n })}
+                      onReset={() => updateGallery({ print_brightness: null })}
+                    />
+                    <div style={s.subSection}>
+                      <div style={s.subSectionLabel}>Font pairing</div>
+                      <div style={s.fontPresetRow}>
+                        {FONT_PRESET_LIST.map(p => {
+                          const active = (gallery.font_preset || 'editorial') === p.key;
+                          return (
+                            <button
+                              key={p.key}
+                              type="button"
+                              onClick={() => updateGallery({ font_preset: p.key })}
+                              style={{
+                                ...s.fontPresetBtn,
+                                ...(active ? s.fontPresetBtnActive : {}),
+                              }}
+                            >
+                              <span style={s.fontPresetLabel}>{p.label}</span>
+                              <span style={{ fontFamily: p.serif, fontStyle: 'italic', fontSize: '15px', lineHeight: 1 }}>Aa</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <BoxPreview
+                    boxColor={gallery.box_color || 'var(--tray-outer)'}
+                    feltColor={gallery.felt_color || '#100c08'}
+                    textColor={gallery.text_color || 'var(--text)'}
+                    sneakPeekColor={gallery.sneak_peek_color || 'var(--text-muted)'}
+                    titleColor={gallery.title_color || 'var(--title)'}
+                    paperColor={gallery.paper_color || 'var(--print-bg)'}
+                    printBrightness={gallery.print_brightness ?? 0.92}
+                    hasFeltOverride={!!gallery.felt_color}
+                    fontSerif={activePreset.serif}
+                    fontSans={activePreset.sans}
+                    coupleNames={gallery.couple_names}
+                    sneakPeekLabel={gallery.sneak_peek_label}
+                  />
+                </div>
+              </div>
+            )}
+
+            {tab === 'photos' && (
+              <>
+                <div style={s.card}>
+                  <div style={s.cardHead}>
+                    <div style={s.cardEyebrow}>Upload</div>
+                    <div style={s.cardTitle}>Add photos</div>
+                  </div>
+                  <div
+                    style={{
+                      ...s.dropZone,
+                      borderColor: dragOver ? 'var(--accent)' : 'var(--border)',
+                      background: dragOver ? 'var(--toggle-bg)' : 'transparent',
+                    }}
+                    onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={handleFileDrop}
+                    onClick={() => !uploading && fileInputRef.current?.click()}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept="image/jpeg,image/png,image/webp"
+                      style={{ display: 'none' }}
+                      onChange={e => e.target.files && uploadFiles(e.target.files)}
+                    />
+                    {uploading ? (
+                      <div>
+                        <p style={s.dropText}>{uploadCurrent} of {uploadTotal}</p>
+                        <div style={s.progressBar}>
+                          <div style={{ ...s.progressFill, width: `${uploadPct}%` }} />
+                        </div>
+                        {uploadFailed.length > 0 && (
+                          <p style={s.failedText}>{uploadFailed.length} failed</p>
+                        )}
+                        <button
+                          style={{ ...s.btnSmall, marginTop: '12px' }}
+                          onClick={(e) => { e.stopPropagation(); abortRef.current = true; }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <p style={s.dropText}>Drop photos here or click to upload</p>
+                        <p style={s.dropSub}>JPEG, PNG, WebP — handles 100+ photos, uploaded one at a time</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {photos.length > 0 && (
+                  <div style={s.card}>
+                    <div style={s.cardHead}>
+                      <div style={s.cardEyebrow}>Order</div>
+                      <div style={s.cardTitle}>Arrange your prints</div>
+                      <p style={s.cardHelp}>
+                        {sortMode === 'custom'
+                          ? 'Drag to reorder. The first photo sits on top of the stack.'
+                          : 'Pick a preset sort, or switch to Custom to drag prints around.'}
+                      </p>
+                    </div>
+                    <div style={s.sortBarV2}>
+                      {[
+                        { key: 'custom', label: 'Custom' },
+                        { key: 'name-asc', label: 'Name A→Z' },
+                        { key: 'name-desc', label: 'Name Z→A' },
+                        { key: 'time-asc', label: 'Oldest' },
+                        { key: 'time-desc', label: 'Newest' },
+                      ].map(opt => (
+                        <button
+                          key={opt.key}
+                          style={{
+                            ...s.segBtn,
+                            ...(sortMode === opt.key ? s.segBtnActive : {}),
+                          }}
+                          onClick={() => applySortMode(opt.key as typeof sortMode)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={s.photoGrid}>
+                      {photos.map((photo, idx) => (
+                        <div
+                          key={photo.id}
+                          style={{
+                            ...s.photoCard,
+                            opacity: dragIdx === idx ? 0.4 : 1,
+                            outline: dropIdx === idx ? '2px solid var(--accent)' : 'none',
+                            cursor: sortMode === 'custom' ? 'grab' : 'default',
+                          }}
+                          draggable={sortMode === 'custom'}
+                          onDragStart={() => sortMode === 'custom' && handleDragStart(idx)}
+                          onDragOver={e => sortMode === 'custom' && handleDragOver(e, idx)}
+                          onDrop={() => sortMode === 'custom' && handleDropReorder(idx)}
+                          onDragEnd={() => { setDragIdx(null); setDropIdx(null); }}
+                        >
+                          <img src={photo.url} alt={photo.filename} style={s.photoThumb} />
+                          <div style={s.photoOverlay}>
+                            <span style={s.photoTag}>
+                              {idx + 1} · {photo.is_landscape ? 'L' : 'P'}
+                            </span>
+                            <button
+                              style={s.deleteBtn}
+                              onClick={(e) => { e.stopPropagation(); deletePhoto(photo.id); }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </main>
+        </>
+      )}
     </div>
   );
 }
@@ -772,36 +843,241 @@ const s: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
     fontFamily: "'DM Sans', sans-serif",
-    padding: '40px 20px 100px',
     color: 'var(--text-2)',
+    paddingBottom: '120px',
   },
-  container: {
-    maxWidth: '780px',
+  topbar: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 50,
+    background: 'var(--bg)',
+    borderBottom: '1px solid var(--border-soft)',
+    backdropFilter: 'saturate(180%) blur(8px)',
+    WebkitBackdropFilter: 'saturate(180%) blur(8px)',
+  },
+  topbarInner: {
+    maxWidth: '1080px',
     margin: '0 auto',
+    padding: '14px 32px 12px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '18px',
   },
-  backBtn: {
+  crumb: {
     background: 'none',
     border: 'none',
-    fontSize: '14px',
     color: 'var(--text-muted)',
+    fontSize: '13px',
     cursor: 'pointer',
-    marginBottom: '24px',
+    fontFamily: "'DM Sans', sans-serif",
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 8px',
+    marginLeft: '-8px',
+    borderRadius: '4px',
+  },
+  topbarTitleWrap: {
+    flex: 1,
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+  },
+  topbarTitle: {
+    fontFamily: "'Playfair Display', serif",
+    fontSize: '18px',
+    fontWeight: 500,
+    color: 'var(--text)',
+    letterSpacing: '0.5px',
+    margin: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  },
+  topbarMeta: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+  },
+  slugPill: {
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    fontSize: '11px',
+    padding: '2px 8px',
+    border: '1px solid var(--border-soft)',
+    borderRadius: '999px',
+    color: 'var(--text-muted)',
+  },
+  savingDot: {
+    fontStyle: 'italic',
+    color: 'var(--text-muted)',
+  },
+  topbarActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  ghostBtn: {
+    padding: '8px 14px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: 'var(--text-2)',
+    background: 'transparent',
+    border: '1px solid var(--border)',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+    textDecoration: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
+  primaryBtn: {
+    padding: '8px 16px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: 'var(--accent-fg)',
+    background: 'var(--accent)',
+    border: '1px solid var(--accent)',
+    borderRadius: '6px',
+    cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
   },
-  topRow: {
-    display: 'flex',
-    gap: '24px',
-    marginBottom: '28px',
-    flexWrap: 'wrap' as const,
+  primaryBtnLive: {
+    color: '#1a1613',
+    background: 'var(--success)',
+    border: '1px solid var(--success)',
   },
-  themePanel: {
+  tabsRow: {
+    maxWidth: '1080px',
+    margin: '0 auto',
+    padding: '0 32px',
     display: 'flex',
-    gap: '28px',
-    padding: '20px',
-    marginBottom: '28px',
-    border: '1px solid var(--border-soft)',
-    borderRadius: '6px',
+    gap: '4px',
+  },
+  tab: {
+    padding: '12px 14px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: 'var(--text-muted)',
+    background: 'transparent',
+    border: 'none',
+    borderBottom: '2px solid transparent',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+    marginBottom: '-1px',
+  },
+  tabActive: {
+    color: 'var(--text)',
+    borderBottom: '2px solid var(--accent)',
+  },
+  main: {
+    maxWidth: '1080px',
+    margin: '0 auto',
+    padding: '32px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '20px',
+  },
+  card: {
     background: 'var(--surface)',
+    border: '1px solid var(--border-soft)',
+    borderRadius: '10px',
+    padding: '28px',
+    boxShadow: 'var(--shadow-sm)',
+  },
+  cardHead: {
+    marginBottom: '20px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '4px',
+  },
+  cardEyebrow: {
+    fontSize: '11px',
+    color: 'var(--text-muted)',
+    letterSpacing: '1.5px',
+    textTransform: 'uppercase' as const,
+    fontWeight: 500,
+  },
+  cardTitle: {
+    fontSize: '17px',
+    color: 'var(--text)',
+    fontWeight: 500,
+  },
+  cardHelp: {
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+    lineHeight: 1.5,
+    marginTop: '4px',
+  },
+  field: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '6px',
+    marginBottom: '20px',
+  },
+  fieldLabel: {
+    fontSize: '12px',
+    fontWeight: 500,
+    color: 'var(--text-2)',
+    letterSpacing: '0.3px',
+  },
+  fieldHelp: {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+    lineHeight: 1.4,
+    marginTop: '2px',
+  },
+  slugInputRow: {
+    display: 'flex',
+    alignItems: 'stretch',
+    border: '1px solid var(--border)',
+    borderRadius: '6px',
+    overflow: 'hidden',
+  },
+  slugPrefix: {
+    padding: '10px 12px',
+    background: 'var(--surface-2)',
+    color: 'var(--text-muted)',
+    fontSize: '13px',
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    display: 'flex',
+    alignItems: 'center',
+    borderRight: '1px solid var(--border)',
+  },
+  slugInput: {
+    border: 'none',
+    borderRadius: 0,
+    flex: 1,
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+  },
+  segGroup: {
+    display: 'inline-flex',
+    background: 'var(--surface-2)',
+    padding: '4px',
+    borderRadius: '8px',
+    gap: '2px',
+  },
+  segBtn: {
+    padding: '8px 14px',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: 'var(--text-muted)',
+    background: 'transparent',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  segBtnActive: {
+    color: 'var(--text)',
+    background: 'var(--surface)',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+  },
+  themePanelV2: {
+    display: 'flex',
+    gap: '32px',
     flexWrap: 'wrap' as const,
     alignItems: 'flex-start',
   },
@@ -812,7 +1088,55 @@ const s: Record<string, React.CSSProperties> = {
     flexDirection: 'column' as const,
     gap: '2px',
   },
-  fields: { flex: 1, minWidth: '260px' },
+  subSection: {
+    padding: '14px 0 4px',
+    borderTop: '1px solid var(--border-soft)',
+    marginTop: '12px',
+  },
+  subSectionLabel: {
+    fontSize: '12px',
+    fontWeight: 500,
+    color: 'var(--text-2)',
+    marginBottom: '10px',
+    letterSpacing: '0.3px',
+  },
+  fontPresetRow: {
+    display: 'flex',
+    gap: '6px',
+    flexWrap: 'wrap' as const,
+  },
+  fontPresetBtn: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    gap: '4px',
+    padding: '8px 14px',
+    minWidth: '84px',
+    background: 'var(--surface-2)',
+    border: '1px solid transparent',
+    borderRadius: '6px',
+    color: 'var(--text-muted)',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  fontPresetBtnActive: {
+    color: 'var(--text)',
+    background: 'var(--surface)',
+    border: '1px solid var(--accent)',
+  },
+  fontPresetLabel: {
+    fontSize: '11px',
+    letterSpacing: '0.5px',
+  },
+  sortBarV2: {
+    display: 'inline-flex',
+    background: 'var(--surface-2)',
+    padding: '4px',
+    borderRadius: '8px',
+    gap: '2px',
+    marginBottom: '20px',
+    flexWrap: 'wrap' as const,
+  },
   sidebar: {
     width: '200px',
     display: 'flex',
@@ -830,14 +1154,15 @@ const s: Record<string, React.CSSProperties> = {
   },
   input: {
     width: '100%',
-    padding: '10px 14px',
-    fontSize: '15px',
+    padding: '11px 14px',
+    fontSize: '14px',
     border: '1px solid var(--border)',
-    borderRadius: '4px',
-    background: 'var(--surface)',
+    borderRadius: '6px',
+    background: 'var(--input-bg)',
     color: 'var(--text)',
     fontFamily: "'DM Sans', sans-serif",
     outline: 'none',
+    transition: 'border-color 0.15s ease',
   },
   linkBox: {
     padding: '10px 12px',
