@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from('orders')
-    .select('*')
+    .select('*, gallery:galleries(slug, couple_names)')
     .order('created_at', { ascending: false });
 
   if (galleryId) query = query.eq('gallery_id', galleryId);

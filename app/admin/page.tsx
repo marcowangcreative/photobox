@@ -72,17 +72,25 @@ export default function AdminPage() {
       <div style={s.container}>
         <div style={s.headerRow}>
           <h1 style={s.heading}>Galleries</h1>
-          <button
-            style={s.logoutBtn}
-            onClick={async () => {
-              const supabase = createSupabaseBrowser();
-              await supabase.auth.signOut();
-              router.push('/admin/login');
-              router.refresh();
-            }}
-          >
-            Log out
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              style={s.logoutBtn}
+              onClick={() => router.push('/admin/orders')}
+            >
+              Orders
+            </button>
+            <button
+              style={s.logoutBtn}
+              onClick={async () => {
+                const supabase = createSupabaseBrowser();
+                await supabase.auth.signOut();
+                router.push('/admin/login');
+                router.refresh();
+              }}
+            >
+              Log out
+            </button>
+          </div>
         </div>
 
         {/* Create new */}
