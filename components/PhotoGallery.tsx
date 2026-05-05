@@ -573,7 +573,6 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                   ? `scale(${gridPinchScale})${gridViewing.isLandscape && isMobile ? ' rotate(90deg)' : ''}`
                   : (gridViewing.isLandscape && isMobile ? 'rotate(90deg)' : 'rotate(-0.3deg)'),
               transition: gridPinchScale > 1 ? 'none' : 'transform 0.25s ease',
-              opacity: gridDragging ? Math.max(0.5, 1 - Math.abs(gridDragX) / 350) : 1,
             }}>
               <img src={gridViewing.url} alt="" style={st.viewImg} />
             </div>
@@ -746,7 +745,6 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                   ? `scale(${pinchScale})${viewingPhoto.isLandscape && isMobile ? ' rotate(90deg)' : ''}`
                   : (viewingPhoto.isLandscape && isMobile ? 'rotate(90deg)' : 'rotate(-0.3deg)'),
               transition: dragging || pinchScale > 1 ? 'none' : 'transform 0.25s ease',
-              opacity: dragging ? Math.max(0.4, 1 - Math.abs(dragX) / 400) : 1,
             }}>
               <img src={viewingPhoto.url} alt="" style={st.viewImg} />
             </div>
