@@ -22,6 +22,7 @@ interface Props {
   titleColor?: string | null;
   paperColor?: string | null;
   printBrightness?: number | null;
+  fontPreset?: 'editorial' | 'romantic' | 'modern' | null;
 }
 
 // Shift a #rrggbb color toward black (amount < 0) or white (amount > 0).
@@ -108,7 +109,7 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, paperColor, printBrightness }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, paperColor, printBrightness, fontPreset }: Props) {
   const sceneOverrides: Record<string, string> = {};
   if (boxColor) {
     sceneOverrides['--tray-outer'] = boxColor;
@@ -136,6 +137,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   }
   if (printBrightness != null) {
     sceneOverrides['--print-img-brightness'] = String(printBrightness);
+  }
+  if (fontPreset && FONT_PRESETS[fontPreset]) {
+    sceneOverrides['--font-serif'] = FONT_PRESETS[fontPreset].serif;
+    sceneOverrides['--font-sans'] = FONT_PRESETS[fontPreset].sans;
   }
   const sceneStyle = Object.keys(sceneOverrides).length
     ? ({ ...st.scene, ...sceneOverrides } as React.CSSProperties)
@@ -415,7 +420,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         background: 'var(--bg)',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'DM Sans, sans-serif',
+        fontFamily: 'var(--font-sans)',
         color: 'var(--text-accent)',
         padding: '40px',
         textAlign: 'center',
@@ -429,7 +434,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
           <path d="M10.5 8V6.5a1.5 1.5 0 0 1 3 0V8" />
         </svg>
         <div style={{
-          fontFamily: 'Playfair Display, serif',
+          fontFamily: 'var(--font-serif)',
           fontSize: '22px', fontWeight: 600,
           marginBottom: '12px', color: 'var(--text)',
         }}>Lock your orientation</div>
@@ -769,8 +774,15 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   );
 }
 
+export const FONT_PRESETS = {
+  editorial: { serif: "'Playfair Display', serif", sans: "'DM Sans', sans-serif" },
+  romantic:  { serif: "'Cormorant Garamond', serif", sans: "'Lato', sans-serif" },
+  modern:    { serif: "'Fraunces', serif", sans: "'Inter', sans-serif" },
+} as const;
+export type FontPresetKey = keyof typeof FONT_PRESETS;
+
 const baseStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&family=Fraunces:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
   @media screen and (max-width: 1024px) and (orientation: landscape) and (pointer: coarse) {
     html { transform: rotate(-90deg); transform-origin: top left;
@@ -827,7 +839,7 @@ const st: Record<string, React.CSSProperties> = {
       'radial-gradient(ellipse at 55% 75%, var(--bg-scene-3) 0%, transparent 55%),' +
       'linear-gradient(160deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 30%, var(--bg-grad-3) 60%, var(--bg-grad-4) 100%)',
     overflow: 'hidden',
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: 'var(--font-sans)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -839,7 +851,7 @@ const st: Record<string, React.CSSProperties> = {
     zIndex: 2,
   },
   title: {
-    fontFamily: "'Playfair Display', serif",
+    fontFamily: 'var(--font-serif)',
     fontSize: '22px',
     fontWeight: 400,
     fontStyle: 'italic',
@@ -965,7 +977,7 @@ const st: Record<string, React.CSSProperties> = {
     marginTop: '-15%',
   },
   lidNames: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: 'var(--font-sans)',
     fontSize: '18px',
     fontWeight: 400,
     color: 'var(--text)',
@@ -974,7 +986,7 @@ const st: Record<string, React.CSSProperties> = {
     marginBottom: '0px',
   },
   lidSub: {
-    fontFamily: "'Playfair Display', serif",
+    fontFamily: 'var(--font-serif)',
     fontSize: '13px',
     fontWeight: 400,
     fontStyle: 'italic',

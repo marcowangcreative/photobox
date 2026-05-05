@@ -127,7 +127,7 @@ function SliderRow({ label, value, isCustom, min, max, step, format, onChange, o
   );
 }
 
-function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor, paperColor, printBrightness, coupleNames, sneakPeekLabel, hasFeltOverride }: {
+function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor, paperColor, printBrightness, coupleNames, sneakPeekLabel, hasFeltOverride, fontSerif, fontSans }: {
   boxColor: string;
   feltColor: string;
   textColor: string;
@@ -138,6 +138,8 @@ function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor
   coupleNames: string;
   sneakPeekLabel: string;
   hasFeltOverride: boolean;
+  fontSerif: string;
+  fontSans: string;
 }) {
   const grad1 = shadeHex(feltColor, -0.4);
   const grad2 = shadeHex(feltColor, -0.2);
@@ -164,7 +166,7 @@ function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor
           }}>
             <div style={{ textAlign: 'center', marginTop: '-15%', padding: '0 12px' }}>
               <div style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: fontSans,
                 fontSize: '11px', fontWeight: 400,
                 color: textColor, letterSpacing: '2px',
                 textTransform: 'uppercase', marginBottom: '2px',
@@ -174,7 +176,7 @@ function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor
                 {coupleNames}
               </div>
               <div style={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: fontSerif,
                 fontSize: '9px', fontStyle: 'italic',
                 color: sneakPeekColor, letterSpacing: '0.5px',
               }}>
@@ -238,7 +240,7 @@ function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor
           Grid title
         </div>
         <div style={{
-          fontFamily: "'Playfair Display', serif",
+          fontFamily: fontSerif,
           fontStyle: 'italic', fontSize: '14px',
           color: titleColor, letterSpacing: '1.5px',
         }}>
@@ -338,7 +340,14 @@ interface Gallery {
   title_color: string | null;
   paper_color: string | null;
   print_brightness: number | null;
+  font_preset: 'editorial' | 'romantic' | 'modern' | null;
 }
+
+const FONT_PRESET_LIST = [
+  { key: 'editorial', label: 'Editorial', serif: "'Playfair Display', serif", sans: "'DM Sans', sans-serif" },
+  { key: 'romantic',  label: 'Romantic',  serif: "'Cormorant Garamond', serif", sans: "'Lato', sans-serif" },
+  { key: 'modern',    label: 'Modern',    serif: "'Fraunces', serif", sans: "'Inter', sans-serif" },
+] as const;
 
 export default function GalleryEditor() {
   const { id } = useParams();
@@ -504,7 +513,7 @@ export default function GalleryEditor() {
   return (
     <div style={s.page}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&family=Fraunces:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); }
       `}</style>
@@ -604,6 +613,31 @@ export default function GalleryEditor() {
                   onChange={n => updateGallery({ print_brightness: n })}
                   onReset={() => updateGallery({ print_brightness: null })}
                 />
+                <div style={{ padding: '10px 0 4px', borderTop: '1px solid var(--border-soft)', marginTop: '8px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-2)', marginBottom: '8px' }}>Font pairing</div>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {FONT_PRESET_LIST.map(p => {
+                      const active = (gallery.font_preset || 'editorial') === p.key;
+                      return (
+                        <button
+                          key={p.key}
+                          type="button"
+                          onClick={() => updateGallery({ font_preset: p.key })}
+                          style={{
+                            ...s.sortBtn,
+                            ...(active ? s.sortBtnActive : {}),
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', gap: '2px',
+                            padding: '6px 12px', minWidth: '78px',
+                          }}
+                        >
+                          <span style={{ fontSize: '11px', letterSpacing: '0.5px' }}>{p.label}</span>
+                          <span style={{ fontFamily: p.serif, fontStyle: 'italic', fontSize: '13px', lineHeight: 1 }}>Aa</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
               <BoxPreview
                 boxColor={gallery.box_color || 'var(--tray-outer)'}
@@ -614,6 +648,8 @@ export default function GalleryEditor() {
                 paperColor={gallery.paper_color || 'var(--print-bg)'}
                 printBrightness={gallery.print_brightness ?? 0.92}
                 hasFeltOverride={!!gallery.felt_color}
+                fontSerif={FONT_PRESET_LIST.find(p => p.key === (gallery.font_preset || 'editorial'))!.serif}
+                fontSans={FONT_PRESET_LIST.find(p => p.key === (gallery.font_preset || 'editorial'))!.sans}
                 coupleNames={gallery.couple_names}
                 sneakPeekLabel={gallery.sneak_peek_label}
               />

@@ -11,6 +11,7 @@ export interface Gallery {
   title_color: string | null;
   paper_color: string | null;
   print_brightness: number | null;
+  font_preset: 'editorial' | 'romantic' | 'modern' | null;
   created_at: string;
   updated_at: string;
 }
