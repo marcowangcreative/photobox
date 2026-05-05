@@ -821,7 +821,7 @@ export default function GalleryEditor() {
                     ) : (
                       <>
                         <p style={s.dropText}>Drop photos here or click to upload</p>
-                        <p style={s.dropSub}>JPEG, PNG, WebP — handles 100+ photos, uploaded one at a time</p>
+                        <p style={s.dropSub}>JPEG, PNG, WebP. Handles 100+ photos, uploaded one at a time.</p>
                       </>
                     )}
                   </div>
@@ -904,7 +904,7 @@ export default function GalleryEditor() {
                       : `${orders.length} order${orders.length === 1 ? '' : 's'} placed`}
                   </div>
                   <p style={s.cardHelp}>
-                    Customers see the &quot;Order — ${(gallery.price_cents / 100).toFixed(0)}&quot; pill on the gallery.
+                    Customers see the &quot;Order ${(gallery.price_cents / 100).toFixed(0)}&quot; pill on the gallery.
                     Paid orders show below with full shipping details. Mark fulfilled when you've shipped the box.
                   </p>
                 </div>

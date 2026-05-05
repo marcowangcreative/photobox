@@ -4,7 +4,7 @@ import ThemeToggle from '../components/ThemeToggle';
 
 export const metadata: Metadata = {
   title: 'Photokase',
-  description: 'Wedding sneak peeks delivered as a curated keepsake — a tactile box of hand-picked prints.',
+  description: 'Wedding sneak peeks delivered as a curated keepsake. A tactile box of hand-picked prints.',
   icons: {
     icon: '/favicon.png',
   },

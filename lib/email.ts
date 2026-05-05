@@ -23,7 +23,7 @@ function shippingBlock(o: Order) {
 
 export async function sendOrderNotificationEmail(order: Order, gallery: Gallery) {
   if (!resend || !NOTIFICATION_TO) return;
-  const subject = `New order — ${gallery.couple_names} — ${dollars(order.amount_cents)}`;
+  const subject = `New order · ${gallery.couple_names} · ${dollars(order.amount_cents)}`;
   const text = [
     `New order received.`,
     ``,
@@ -32,8 +32,8 @@ export async function sendOrderNotificationEmail(order: Order, gallery: Gallery)
     `Order ID: ${order.id}`,
     ``,
     `Customer:`,
-    `  ${order.customer_name || '—'}`,
-    `  ${order.customer_email || '—'}`,
+    `  ${order.customer_name || '(no name)'}`,
+    `  ${order.customer_email || '(no email)'}`,
     ``,
     `Ship to:`,
     shippingBlock(order).split('\n').map(l => `  ${l}`).join('\n'),
@@ -48,7 +48,7 @@ export async function sendOrderNotificationEmail(order: Order, gallery: Gallery)
 
 export async function sendCustomerReceiptEmail(order: Order, gallery: Gallery) {
   if (!resend || !order.customer_email) return;
-  const subject = `Your Photobox order — ${gallery.couple_names}`;
+  const subject = `Your Photokase order · ${gallery.couple_names}`;
   const text = [
     `Thanks for your order!`,
     ``,

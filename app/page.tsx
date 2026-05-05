@@ -11,7 +11,7 @@ export default function Home() {
       <div style={s.content}>
         <img src="/photokase-logo.png" alt="Photokase" style={s.logo} />
         <p style={s.sub}>
-          Wedding sneak peeks delivered as a curated keepsake — a tactile box of hand-picked prints, with the option to order the real thing.
+          Wedding sneak peeks delivered as a curated keepsake. A tactile box of hand-picked prints, with the option to order the real thing.
         </p>
 
         <div style={s.actions}>

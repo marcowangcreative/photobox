@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         currency: 'usd',
         unit_amount: amount,
         product_data: {
-          name: `Photobox — ${gallery.couple_names}`,
+          name: `Photokase: ${gallery.couple_names}`,
           description: `A curated keepsake box of prints from ${gallery.couple_names}'s gallery.`,
         },
       },

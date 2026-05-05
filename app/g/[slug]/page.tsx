@@ -20,10 +20,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!gallery) return { title: 'Gallery Not Found' };
 
   return {
-    title: `${gallery.couple_names} — Photobox`,
+    title: `${gallery.couple_names} · Photokase`,
     description: `${gallery.couple_names} wedding gallery`,
     openGraph: {
-      title: `${gallery.couple_names} — Photobox`,
+      title: `${gallery.couple_names} · Photokase`,
       description: 'Open the box to see the prints.',
     },
   };

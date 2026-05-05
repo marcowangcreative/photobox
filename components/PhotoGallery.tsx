@@ -185,7 +185,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
           tabIndex={0}
         >
           {orderBanner === 'success'
-            ? `Thank you — your order is in. Check your inbox for a receipt.`
+            ? `Thank you. Your order is in. Check your inbox for a receipt.`
             : `Order cancelled. No charge was made.`}
           <span style={st.orderBannerClose}>×</span>
         </div>
@@ -194,8 +194,8 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
         type="button"
         onClick={() => setOrderModalOpen(true)}
         style={st.orderToggle}
-        aria-label={`Order this print box — ${priceLabel}`}
-        title={`Order this print box — ${priceLabel}`}
+        aria-label={`Order this print box, ${priceLabel}`}
+        title={`Order this print box, ${priceLabel}`}
       >
         <CartIcon />
       </button>
@@ -219,8 +219,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             <div style={st.modalEyebrow}>The Photobox</div>
             <h2 style={st.modalTitle}>{coupleNames}</h2>
             <p style={st.modalLead}>
-              A curated keepsake box of {rawPhotos.length} hand-picked prints from the day —
-              the kind of gift parents pull off the shelf at every visit.
+              A curated keepsake box of {rawPhotos.length} hand-picked prints from the day. The kind of gift parents pull off the shelf at every visit.
             </p>
 
             <ul style={st.modalBullets}>
@@ -234,7 +233,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               </li>
               <li style={st.modalBullet}>
                 <span style={st.modalBulletDot} />
-                Shipped to any US address — usually 7–10 days
+                Shipped to any US address, usually 7–10 days
               </li>
             </ul>
 
@@ -701,7 +700,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               <div style={st.orderHeroEyebrow}>One curated keepsake box</div>
               <div style={st.orderHeroTitle}>{coupleNames}</div>
               <div style={st.orderHeroDesc}>
-                A printed, hand-curated photobox of these prints — shipped to your door.
+                A printed, hand-curated photobox of these prints, shipped to your door.
               </div>
               <button
                 type="button"
@@ -709,7 +708,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
                 onClick={() => setOrderModalOpen(true)}
                 disabled={orderLoading}
               >
-                {orderLoading ? 'Loading…' : `Order this box — ${priceLabel}`}
+                {orderLoading ? 'Loading…' : `Order this box · ${priceLabel}`}
               </button>
             </div>
           )}
