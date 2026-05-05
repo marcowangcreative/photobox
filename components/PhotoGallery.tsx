@@ -113,6 +113,7 @@ function CollapseIcon() {
 export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, printBrightness, fontPreset, galleryId, priceCents }: Props) {
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderBanner, setOrderBanner] = useState<'success' | 'cancelled' | null>(null);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
 
   const startCheckout = useCallback(async () => {
     if (orderLoading) return;
@@ -150,6 +151,20 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     }
   }, []);
 
+  useEffect(() => {
+    if (!orderModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOrderModalOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [orderModalOpen]);
+
   const orderOverlay = (
     <>
       {orderBanner && (
@@ -167,13 +182,80 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
       )}
       <button
         type="button"
-        onClick={startCheckout}
-        disabled={orderLoading}
+        onClick={() => setOrderModalOpen(true)}
         style={st.orderPill}
         title="Order this curated print box"
       >
-        {orderLoading ? 'Loading…' : `Order — ${priceLabel}`}
+        Order — {priceLabel}
       </button>
+      {orderModalOpen && (
+        <div style={st.modalBackdrop} onClick={() => setOrderModalOpen(false)}>
+          <div
+            style={st.modalCard}
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <button
+              type="button"
+              style={st.modalClose}
+              onClick={() => setOrderModalOpen(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            <div style={st.modalEyebrow}>The Photobox</div>
+            <h2 style={st.modalTitle}>{coupleNames}</h2>
+            <p style={st.modalLead}>
+              A curated keepsake box of {rawPhotos.length} hand-picked prints from the day —
+              the kind of gift parents pull off the shelf at every visit.
+            </p>
+
+            <ul style={st.modalBullets}>
+              <li style={st.modalBullet}>
+                <span style={st.modalBulletDot} />
+                {rawPhotos.length} prints, hand-selected by your photographer
+              </li>
+              <li style={st.modalBullet}>
+                <span style={st.modalBulletDot} />
+                Premium keepsake box, made to last
+              </li>
+              <li style={st.modalBullet}>
+                <span style={st.modalBulletDot} />
+                Shipped to any US address — usually 7–10 days
+              </li>
+            </ul>
+
+            <div style={st.modalPerfectFor}>
+              <span style={st.modalPerfectForLabel}>Perfect for</span>
+              <span style={st.modalPerfectForList}>
+                parents · grandparents · the wedding party · post-honeymoon you
+              </span>
+            </div>
+
+            <div style={st.modalCtaRow}>
+              <div style={st.modalPriceCol}>
+                <div style={st.modalPriceLabel}>One box</div>
+                <div style={st.modalPriceValue}>{priceLabel}</div>
+                <div style={st.modalPriceNote}>Shipping included</div>
+              </div>
+              <button
+                type="button"
+                style={st.modalCtaBtn}
+                onClick={startCheckout}
+                disabled={orderLoading}
+              >
+                {orderLoading ? 'Opening checkout…' : 'Continue to checkout →'}
+              </button>
+            </div>
+
+            <p style={st.modalFinePrint}>
+              Secure payment via Stripe. Your photographer is notified the moment you order.
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
   const sceneOverrides: Record<string, string> = {};
@@ -613,7 +695,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               <button
                 type="button"
                 style={st.orderHeroBtn}
-                onClick={startCheckout}
+                onClick={() => setOrderModalOpen(true)}
                 disabled={orderLoading}
               >
                 {orderLoading ? 'Loading…' : `Order this box — ${priceLabel}`}
@@ -765,7 +847,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
               <button
                 type="button"
                 style={st.orderHeroBtn}
-                onClick={startCheckout}
+                onClick={() => setOrderModalOpen(true)}
                 disabled={orderLoading}
               >
                 {orderLoading ? 'Loading…' : `Order this box — ${priceLabel}`}
@@ -1515,5 +1597,173 @@ const st: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     fontFamily: 'var(--font-sans)',
     boxShadow: '0 4px 18px rgba(0,0,0,0.18)',
+  },
+  modalBackdrop: {
+    position: 'fixed',
+    inset: 0,
+    zIndex: 100,
+    background: 'rgba(0,0,0,0.55)',
+    backdropFilter: 'blur(4px)',
+    WebkitBackdropFilter: 'blur(4px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '20px',
+    animation: 'fadeIn 0.2s ease',
+  },
+  modalCard: {
+    position: 'relative',
+    background: 'var(--surface)',
+    border: '1px solid var(--border-soft)',
+    borderRadius: '14px',
+    padding: '40px 36px 32px',
+    maxWidth: '460px',
+    width: '100%',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    fontFamily: 'var(--font-sans)',
+    color: 'var(--text)',
+    boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3)',
+    animation: 'fadeIn 0.25s ease',
+  },
+  modalClose: {
+    position: 'absolute',
+    top: 14,
+    right: 16,
+    width: 32,
+    height: 32,
+    borderRadius: '50%',
+    border: 'none',
+    background: 'transparent',
+    color: 'var(--text-muted)',
+    fontSize: 22,
+    lineHeight: 1,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalEyebrow: {
+    fontSize: 11,
+    letterSpacing: '2px',
+    textTransform: 'uppercase',
+    color: 'var(--text-muted)',
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontFamily: 'var(--font-serif)',
+    fontStyle: 'italic',
+    fontSize: 30,
+    fontWeight: 400,
+    color: 'var(--text)',
+    letterSpacing: '0.5px',
+    margin: 0,
+    marginBottom: 14,
+    lineHeight: 1.15,
+  },
+  modalLead: {
+    fontSize: 14,
+    lineHeight: 1.55,
+    color: 'var(--text-2)',
+    margin: 0,
+    marginBottom: 22,
+  },
+  modalBullets: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    marginBottom: 20,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+  },
+  modalBullet: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 10,
+    fontSize: 13,
+    lineHeight: 1.5,
+    color: 'var(--text-2)',
+  },
+  modalBulletDot: {
+    flexShrink: 0,
+    width: 5,
+    height: 5,
+    borderRadius: '50%',
+    background: 'var(--text-muted)',
+    marginTop: 8,
+  },
+  modalPerfectFor: {
+    padding: '12px 14px',
+    background: 'var(--surface-2)',
+    borderRadius: 8,
+    marginBottom: 24,
+    fontSize: 12,
+    lineHeight: 1.5,
+  },
+  modalPerfectForLabel: {
+    color: 'var(--text-muted)',
+    letterSpacing: '0.5px',
+    textTransform: 'uppercase',
+    fontSize: 10,
+    marginRight: 8,
+  },
+  modalPerfectForList: {
+    color: 'var(--text-2)',
+    fontStyle: 'italic',
+  },
+  modalCtaRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 16,
+    padding: '16px 0',
+    borderTop: '1px solid var(--border-soft)',
+    marginTop: 4,
+    flexWrap: 'wrap',
+  },
+  modalPriceCol: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+    flexShrink: 0,
+  },
+  modalPriceLabel: {
+    fontSize: 10,
+    letterSpacing: '1.5px',
+    textTransform: 'uppercase',
+    color: 'var(--text-muted)',
+  },
+  modalPriceValue: {
+    fontSize: 24,
+    fontWeight: 500,
+    color: 'var(--text)',
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    letterSpacing: '-0.5px',
+  },
+  modalPriceNote: {
+    fontSize: 11,
+    color: 'var(--text-muted)',
+  },
+  modalCtaBtn: {
+    flex: 1,
+    minWidth: '200px',
+    padding: '14px 22px',
+    fontSize: 14,
+    fontWeight: 500,
+    letterSpacing: '0.3px',
+    color: 'var(--accent-fg)',
+    background: 'var(--accent)',
+    border: 'none',
+    borderRadius: 8,
+    cursor: 'pointer',
+    fontFamily: 'var(--font-sans)',
+    boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
+  },
+  modalFinePrint: {
+    fontSize: 11,
+    color: 'var(--text-muted)',
+    textAlign: 'center',
+    marginTop: 14,
+    lineHeight: 1.5,
   },
 };
