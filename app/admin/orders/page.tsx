@@ -236,7 +236,7 @@ const s: Record<string, React.CSSProperties> = {
     gap: '4px',
     padding: '6px 8px',
     marginLeft: '-8px',
-    borderRadius: '4px',
+    borderRadius: '2px',
   },
   title: {
     fontFamily: "'Playfair Display', serif",
@@ -262,7 +262,7 @@ const s: Record<string, React.CSSProperties> = {
   stat: {
     background: 'var(--surface)',
     border: '1px solid var(--border-soft)',
-    borderRadius: '10px',
+    borderRadius: '2px',
     padding: '18px 20px',
   },
   statHighlight: {
@@ -286,7 +286,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'inline-flex',
     background: 'var(--surface-2)',
     padding: '4px',
-    borderRadius: '8px',
+    borderRadius: '2px',
     gap: '2px',
     alignSelf: 'flex-start',
     flexWrap: 'wrap',
@@ -298,7 +298,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text-muted)',
     background: 'transparent',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
   },
@@ -321,7 +321,7 @@ const s: Record<string, React.CSSProperties> = {
   row: {
     background: 'var(--surface)',
     border: '1px solid var(--border-soft)',
-    borderRadius: '10px',
+    borderRadius: '2px',
     padding: '20px 22px',
     boxShadow: 'var(--shadow-sm)',
   },
@@ -395,7 +395,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text-2)',
     background: 'transparent',
     border: '1px solid var(--border)',
-    borderRadius: '6px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
     flexShrink: 0,

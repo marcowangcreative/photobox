@@ -37,7 +37,7 @@ function ColorRow({ label, value, placeholder, onChange }: {
           style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
         />
         <div style={{
-          width: '100%', height: '100%', borderRadius: '4px',
+          width: '100%', height: '100%', borderRadius: '2px',
           background: display,
           border: '1px solid var(--border)',
           boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.04)',
@@ -55,7 +55,7 @@ function ColorRow({ label, value, placeholder, onChange }: {
           style={{
             width: '100%', maxWidth: '120px', padding: '4px 8px',
             fontSize: '12px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-            border: '1px solid var(--border)', borderRadius: '3px',
+            border: '1px solid var(--border)', borderRadius: '2px',
             background: 'var(--surface)', color: 'var(--text-muted)',
             outline: 'none',
           }}
@@ -93,7 +93,7 @@ function SliderRow({ label, value, isCustom, min, max, step, format, onChange, o
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0' }}>
       <div style={{
         width: '36px', height: '28px', flexShrink: 0,
-        borderRadius: '4px', border: '1px solid var(--border)',
+        borderRadius: '2px', border: '1px solid var(--border)',
         background: `rgba(0,0,0,${(1 - value).toFixed(2)})`,
       }} />
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -233,7 +233,7 @@ function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor
 
       {/* Grid title sample */}
       <div style={{
-        width: `${W * 2 + 16}px`, padding: '10px 8px', borderRadius: '3px',
+        width: `${W * 2 + 16}px`, padding: '10px 8px', borderRadius: '2px',
         background: 'var(--surface)', textAlign: 'center',
       }}>
         <div style={{ fontSize: '8px', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
@@ -687,7 +687,7 @@ export default function GalleryEditor() {
                   <div style={s.field}>
                     <label style={s.fieldLabel}>USD</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ ...s.slugPrefix, borderRadius: '6px', border: '1px solid var(--border)' }}>$</span>
+                      <span style={{ ...s.slugPrefix, borderRadius: '2px', border: '1px solid var(--border)' }}>$</span>
                       <input
                         type="number"
                         min={0}
@@ -1018,7 +1018,7 @@ const s: Record<string, React.CSSProperties> = {
     gap: '4px',
     padding: '6px 8px',
     marginLeft: '-8px',
-    borderRadius: '4px',
+    borderRadius: '2px',
   },
   topbarTitleWrap: {
     flex: 1,
@@ -1069,7 +1069,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text-2)',
     background: 'transparent',
     border: '1px solid var(--border)',
-    borderRadius: '6px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
     textDecoration: 'none',
@@ -1083,7 +1083,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--accent-fg)',
     background: 'var(--accent)',
     border: '1px solid var(--accent)',
-    borderRadius: '6px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
   },
@@ -1126,7 +1126,7 @@ const s: Record<string, React.CSSProperties> = {
   card: {
     background: 'var(--surface)',
     border: '1px solid var(--border-soft)',
-    borderRadius: '10px',
+    borderRadius: '2px',
     padding: '28px',
     boxShadow: 'var(--shadow-sm)',
   },
@@ -1176,7 +1176,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'stretch',
     border: '1px solid var(--border)',
-    borderRadius: '6px',
+    borderRadius: '2px',
     overflow: 'hidden',
   },
   slugPrefix: {
@@ -1199,7 +1199,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'inline-flex',
     background: 'var(--surface-2)',
     padding: '4px',
-    borderRadius: '8px',
+    borderRadius: '2px',
     gap: '2px',
   },
   segBtn: {
@@ -1209,7 +1209,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text-muted)',
     background: 'transparent',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
   },
@@ -1257,7 +1257,7 @@ const s: Record<string, React.CSSProperties> = {
     minWidth: '84px',
     background: 'var(--surface-2)',
     border: '1px solid transparent',
-    borderRadius: '6px',
+    borderRadius: '2px',
     color: 'var(--text-muted)',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
@@ -1275,7 +1275,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'inline-flex',
     background: 'var(--surface-2)',
     padding: '4px',
-    borderRadius: '8px',
+    borderRadius: '2px',
     gap: '2px',
     marginBottom: '20px',
     flexWrap: 'wrap' as const,
@@ -1287,7 +1287,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   orderItem: {
     border: '1px solid var(--border-soft)',
-    borderRadius: '8px',
+    borderRadius: '2px',
     padding: '18px 20px',
     background: 'var(--input-bg)',
   },
@@ -1329,7 +1329,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text-2)',
     background: 'transparent',
     border: '1px solid var(--border)',
-    borderRadius: '6px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
     flexShrink: 0,
@@ -1376,7 +1376,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: '11px 14px',
     fontSize: '14px',
     border: '1px solid var(--border)',
-    borderRadius: '6px',
+    borderRadius: '2px',
     background: 'var(--input-bg)',
     color: 'var(--text)',
     fontFamily: "'DM Sans', sans-serif",
@@ -1387,7 +1387,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: '10px 12px',
     background: 'var(--surface)',
     border: '1px solid var(--border-soft)',
-    borderRadius: '4px',
+    borderRadius: '2px',
   },
   linkLabel: {
     display: 'block',
@@ -1410,7 +1410,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--accent-fg)',
     background: 'var(--accent)',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
   },
@@ -1420,7 +1420,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text)',
     background: 'transparent',
     border: '1px solid var(--border)',
-    borderRadius: '4px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
   },
@@ -1435,7 +1435,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   dropZone: {
     border: '2px dashed var(--border)',
-    borderRadius: '6px',
+    borderRadius: '2px',
     padding: '36px 24px',
     textAlign: 'center' as const,
     cursor: 'pointer',
@@ -1501,7 +1501,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'var(--text-muted)',
     background: 'var(--surface)',
     border: '1px solid var(--border)',
-    borderRadius: '20px',
+    borderRadius: '2px',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
     transition: 'all 0.15s ease',
@@ -1519,7 +1519,7 @@ const s: Record<string, React.CSSProperties> = {
   photoCard: {
     position: 'relative' as const,
     aspectRatio: '2/3',
-    borderRadius: '3px',
+    borderRadius: '2px',
     overflow: 'hidden',
     cursor: 'grab',
     transition: 'opacity 0.15s ease',
