@@ -5,6 +5,7 @@ export interface Gallery {
   sneak_peek_label: string;
   is_published: boolean;
   box_color: string | null;
+  box_texture: 'linen' | null;
   text_color: string | null;
   sneak_peek_color: string | null;
   felt_color: string | null;

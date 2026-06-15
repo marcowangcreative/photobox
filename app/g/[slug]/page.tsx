@@ -61,6 +61,7 @@ export default async function GalleryPage({ params }: Props) {
       galleryUrl={`https://box.marcowang.com/g/${slug}`}
       gridStyle={gallery.grid_style || 'stacked'}
       boxColor={gallery.box_color}
+      boxTexture={gallery.box_texture}
       textColor={gallery.text_color}
       sneakPeekColor={gallery.sneak_peek_color}
       feltColor={gallery.felt_color}

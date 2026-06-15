@@ -16,6 +16,7 @@ interface Props {
   galleryUrl: string;
   gridStyle?: 'stacked' | 'clean';
   boxColor?: string | null;
+  boxTexture?: 'linen' | null;
   textColor?: string | null;
   sneakPeekColor?: string | null;
   feltColor?: string | null;
@@ -25,6 +26,12 @@ interface Props {
   galleryId: string;
   priceCents: number;
 }
+
+// Woven-linen overlay: fine warp + weft threads in translucent light/shadow,
+// so it reads as fabric over whatever box color is set. Layered above the color.
+const LINEN_TEXTURE =
+  'repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px),' +
+  'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, rgba(0,0,0,0.06) 2px, transparent 2px, transparent 4px)';
 
 // Shift a #rrggbb color toward black (amount < 0) or white (amount > 0).
 // amount is in [-1, 1]; -0.4 means 40% closer to black.
@@ -120,7 +127,7 @@ function CollapseIcon() {
   );
 }
 
-export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, textColor, sneakPeekColor, feltColor, titleColor, printBrightness, fontPreset, galleryId, priceCents }: Props) {
+export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawPhotos, galleryUrl, gridStyle = 'stacked', boxColor, boxTexture, textColor, sneakPeekColor, feltColor, titleColor, printBrightness, fontPreset, galleryId, priceCents }: Props) {
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderBanner, setOrderBanner] = useState<'success' | 'cancelled' | null>(null);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
@@ -273,6 +280,9 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
   if (boxColor) {
     sceneOverrides['--tray-outer'] = boxColor;
     sceneOverrides['--lid-bg'] = boxColor;
+  }
+  if (boxTexture === 'linen') {
+    sceneOverrides['--box-texture'] = LINEN_TEXTURE;
   }
   if (textColor) {
     sceneOverrides['--text'] = textColor;
@@ -1109,7 +1119,8 @@ const st: Record<string, React.CSSProperties> = {
     width: '200px',
     height: '280px',
     borderRadius: '1px',
-    background: 'var(--tray-outer)',
+    backgroundColor: 'var(--tray-outer)',
+    backgroundImage: 'var(--box-texture, none)',
     boxShadow:
       'inset 0 0 0 1px rgba(255,255,255,0.05),' +
       '0 1px 2px rgba(0,0,0,0.5),' +
@@ -1143,7 +1154,8 @@ const st: Record<string, React.CSSProperties> = {
     width: 'min(80vw, 340px)',
     aspectRatio: '2/3',
     zIndex: 30,
-    background: 'var(--lid-bg)',
+    backgroundColor: 'var(--lid-bg)',
+    backgroundImage: 'var(--box-texture, none)',
     borderRadius: '1px',
     boxShadow:
       '0 4px 20px rgba(0,0,0,0.5),' +
@@ -1158,7 +1170,8 @@ const st: Record<string, React.CSSProperties> = {
     position: 'absolute',
     inset: '-2px',
     zIndex: 30,
-    background: 'var(--lid-bg)',
+    backgroundColor: 'var(--lid-bg)',
+    backgroundImage: 'var(--box-texture, none)',
     borderRadius: '1px',
     boxShadow:
       '0 2px 8px rgba(0,0,0,0.5),' +

@@ -3,6 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
+// Keep in sync with LINEN_TEXTURE in components/PhotoGallery.tsx.
+const LINEN_TEXTURE =
+  'repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px),' +
+  'repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, rgba(0,0,0,0.06) 2px, transparent 2px, transparent 4px)';
+
 function shadeHex(hex: string, amount: number): string {
   const m = /^#?([a-f\d]{6})$/i.exec(hex.trim());
   if (!m) return hex;
@@ -127,8 +132,9 @@ function SliderRow({ label, value, isCustom, min, max, step, format, onChange, o
   );
 }
 
-function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor, paperColor, printBrightness, coupleNames, sneakPeekLabel, hasFeltOverride, fontSerif, fontSans }: {
+function BoxPreview({ boxColor, boxTexture, feltColor, textColor, sneakPeekColor, titleColor, paperColor, printBrightness, coupleNames, sneakPeekLabel, hasFeltOverride, fontSerif, fontSans }: {
   boxColor: string;
+  boxTexture: boolean;
   feltColor: string;
   textColor: string;
   sneakPeekColor: string;
@@ -156,7 +162,8 @@ function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
           <div style={{
             width: `${W}px`, height: `${H}px`, borderRadius: '1px',
-            background: boxColor,
+            backgroundColor: boxColor,
+            backgroundImage: boxTexture ? LINEN_TEXTURE : undefined,
             boxShadow:
               'inset 0 1px 0 rgba(255,255,255,0.05),' +
               '0 3px 12px rgba(0,0,0,0.4),' +
@@ -191,7 +198,8 @@ function BoxPreview({ boxColor, feltColor, textColor, sneakPeekColor, titleColor
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
           <div style={{
             width: `${W}px`, height: `${H}px`, borderRadius: '1px',
-            background: boxColor, padding: '4px',
+            backgroundColor: boxColor, backgroundImage: boxTexture ? LINEN_TEXTURE : undefined,
+            padding: '4px',
             boxShadow:
               'inset 0 0 0 1px rgba(255,255,255,0.05),' +
               '0 3px 12px rgba(0,0,0,0.4),' +
@@ -334,6 +342,7 @@ interface Gallery {
   is_published: boolean;
   grid_style: 'stacked' | 'clean';
   box_color: string | null;
+  box_texture: 'linen' | null;
   text_color: string | null;
   sneak_peek_color: string | null;
   felt_color: string | null;
@@ -721,6 +730,27 @@ export default function GalleryEditor() {
                       onChange={v => updateGallery({ box_color: v })} />
                     <ColorRow label="Box interior (felt)" value={gallery.felt_color} placeholder="#0a0806"
                       onChange={v => updateGallery({ felt_color: v })} />
+                    <div style={s.subSection}>
+                      <div style={s.subSectionLabel}>Box exterior finish</div>
+                      <div style={s.segGroup}>
+                        {([
+                          { key: null, label: 'Smooth' },
+                          { key: 'linen', label: 'Linen' },
+                        ] as const).map(opt => (
+                          <button
+                            key={opt.label}
+                            type="button"
+                            style={{
+                              ...s.segBtn,
+                              ...((gallery.box_texture ?? null) === opt.key ? s.segBtnActive : {}),
+                            }}
+                            onClick={() => updateGallery({ box_texture: opt.key })}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     <ColorRow label="Couple names (lid)" value={gallery.text_color} placeholder="#ece3d1"
                       onChange={v => updateGallery({ text_color: v })} />
                     <ColorRow label="Sneak-peek label (lid)" value={gallery.sneak_peek_color} placeholder="#a0958a"
@@ -760,6 +790,7 @@ export default function GalleryEditor() {
                   </div>
                   <BoxPreview
                     boxColor={gallery.box_color || 'var(--tray-outer)'}
+                    boxTexture={gallery.box_texture === 'linen'}
                     feltColor={gallery.felt_color || '#100c08'}
                     textColor={gallery.text_color || 'var(--text)'}
                     sneakPeekColor={gallery.sneak_peek_color || 'var(--text-muted)'}
