@@ -121,18 +121,24 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const supabase = createAdminClient();
-  const { photo_id } = await req.json();
+  const body = await req.json();
+  const ids: string[] = Array.isArray(body.photo_ids) && body.photo_ids.length
+    ? body.photo_ids
+    : (body.photo_id ? [body.photo_id] : []);
 
-  const { data: photo } = await supabase
+  if (!ids.length) {
+    return NextResponse.json({ error: 'photo_id or photo_ids required' }, { status: 400 });
+  }
+
+  const { data: photos } = await supabase
     .from('photos')
     .select('storage_path')
-    .eq('id', photo_id)
-    .single();
+    .in('id', ids);
 
-  if (photo) {
-    await supabase.storage.from('gallery-photos').remove([photo.storage_path]);
-    await supabase.from('photos').delete().eq('id', photo_id);
+  if (photos?.length) {
+    await supabase.storage.from('gallery-photos').remove(photos.map(p => p.storage_path));
   }
+  await supabase.from('photos').delete().in('id', ids);
 
   return NextResponse.json({ success: true });
 }

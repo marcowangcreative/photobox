@@ -391,6 +391,7 @@ export default function GalleryEditor() {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dropIdx, setDropIdx] = useState<number | null>(null);
   const [sortMode, setSortMode] = useState<'custom' | 'name-asc' | 'name-desc' | 'time-asc' | 'time-desc'>('custom');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
   const abortRef = useRef(false);
@@ -487,6 +488,29 @@ export default function GalleryEditor() {
       body: JSON.stringify({ photo_id: photoId }),
     });
     setPhotos(prev => prev.filter(p => p.id !== photoId));
+    setSelected(prev => { const next = new Set(prev); next.delete(photoId); return next; });
+  }
+
+  function toggleSelect(photoId: string) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(photoId)) next.delete(photoId);
+      else next.add(photoId);
+      return next;
+    });
+  }
+
+  async function deleteSelected() {
+    const ids = [...selected];
+    if (!ids.length) return;
+    if (!confirm(`Delete ${ids.length} photo${ids.length === 1 ? '' : 's'}? This can't be undone.`)) return;
+    await fetch('/api/upload', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ photo_ids: ids }),
+    });
+    setPhotos(prev => prev.filter(p => !selected.has(p.id)));
+    setSelected(new Set());
   }
 
   async function saveOrder(newPhotos: Photo[]) {
@@ -889,6 +913,22 @@ export default function GalleryEditor() {
                         </button>
                       ))}
                     </div>
+                    <div style={s.bulkBar}>
+                      <button
+                        type="button"
+                        style={s.bulkSelectBtn}
+                        onClick={() => setSelected(
+                          selected.size === photos.length ? new Set() : new Set(photos.map(p => p.id))
+                        )}
+                      >
+                        {selected.size === photos.length && photos.length > 0 ? 'Clear selection' : 'Select all'}
+                      </button>
+                      {selected.size > 0 && (
+                        <button type="button" style={s.bulkDeleteBtn} onClick={deleteSelected}>
+                          Delete {selected.size} selected
+                        </button>
+                      )}
+                    </div>
                     <div style={s.photoGrid}>
                       {photos.map((photo, idx) => (
                         <div
@@ -896,7 +936,7 @@ export default function GalleryEditor() {
                           style={{
                             ...s.photoCard,
                             opacity: dragIdx === idx ? 0.4 : 1,
-                            outline: dropIdx === idx ? '2px solid var(--accent)' : 'none',
+                            outline: (dropIdx === idx || selected.has(photo.id)) ? '2px solid var(--accent)' : 'none',
                             cursor: sortMode === 'custom' ? 'grab' : 'default',
                           }}
                           draggable={sortMode === 'custom'}
@@ -906,6 +946,16 @@ export default function GalleryEditor() {
                           onDragEnd={() => { setDragIdx(null); setDropIdx(null); }}
                         >
                           <img src={photo.url} alt={photo.filename} style={s.photoThumb} />
+                          <button
+                            type="button"
+                            style={{ ...s.selectBox, ...(selected.has(photo.id) ? s.selectBoxActive : {}) }}
+                            onClick={(e) => { e.stopPropagation(); toggleSelect(photo.id); }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            draggable={false}
+                            aria-label={selected.has(photo.id) ? 'Deselect photo' : 'Select photo'}
+                          >
+                            {selected.has(photo.id) ? '✓' : ''}
+                          </button>
                           <div style={s.photoOverlay}>
                             <span style={s.photoTag}>
                               {idx + 1} · {photo.is_landscape ? 'L' : 'P'}
@@ -1539,6 +1589,53 @@ const s: Record<string, React.CSSProperties> = {
   },
   sortBtnActive: {
     color: 'var(--accent-fg)',
+    background: 'var(--accent)',
+    borderColor: 'var(--accent)',
+  },
+  bulkBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '12px',
+  },
+  bulkSelectBtn: {
+    background: 'transparent',
+    border: '1px solid var(--border)',
+    color: 'var(--text)',
+    fontSize: '12px',
+    padding: '6px 12px',
+    borderRadius: '2px',
+    cursor: 'pointer',
+  },
+  bulkDeleteBtn: {
+    background: '#b3261e',
+    border: '1px solid #b3261e',
+    color: '#fff',
+    fontSize: '12px',
+    padding: '6px 12px',
+    borderRadius: '2px',
+    cursor: 'pointer',
+  },
+  selectBox: {
+    position: 'absolute' as const,
+    top: '6px',
+    left: '6px',
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    border: '1.5px solid rgba(255,255,255,0.9)',
+    background: 'rgba(0,0,0,0.35)',
+    color: '#fff',
+    fontSize: '13px',
+    lineHeight: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    padding: 0,
+    zIndex: 2,
+  },
+  selectBoxActive: {
     background: 'var(--accent)',
     borderColor: 'var(--accent)',
   },
