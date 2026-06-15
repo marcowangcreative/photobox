@@ -158,3 +158,13 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Top toolbar buttons fade out while a photo is open full-size, so they
+   don't overlap the print. They return when the photo is dismissed. */
+.gallery-chrome {
+  transition: opacity 0.25s ease;
+}
+html[data-viewing='true'] .gallery-chrome {
+  opacity: 0;
+  pointer-events: none;
+}

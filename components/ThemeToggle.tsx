@@ -29,6 +29,7 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
+      className="gallery-chrome"
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       style={{

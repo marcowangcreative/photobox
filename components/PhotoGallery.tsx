@@ -193,6 +193,7 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
       <button
         type="button"
         onClick={() => setOrderModalOpen(true)}
+        className="gallery-chrome"
         style={st.orderToggle}
         aria-label={`Order this print box, ${priceLabel}`}
         title={`Order this print box, ${priceLabel}`}
@@ -567,6 +568,16 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
     return () => window.removeEventListener('keydown', handler);
   }, [phase, pullForward, pullBackward, dismissPhoto, mode, gridViewing, gridNext, gridPrev]);
 
+  // Fade the top toolbar out while a photo is open full-size so it doesn't
+  // overlap the print. CSS keys off this attribute (see globals.css).
+  useEffect(() => {
+    const viewing =
+      gridViewing != null ||
+      (viewingPhoto != null && (phase === 'viewing' || phase === 'pulling' || phase === 'discarding'));
+    document.documentElement.dataset.viewing = viewing ? 'true' : 'false';
+    return () => { document.documentElement.dataset.viewing = 'false'; };
+  }, [gridViewing, viewingPhoto, phase]);
+
   // ——— ORIENTATION HELPER SCREEN ———
   if (showHelper && isMobile) {
     return (
@@ -713,10 +724,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
             </div>
           )}
         </div>
-        <div style={st.modeToggle} onClick={() => setMode('stack')} role="button" tabIndex={0}>
+        <div className="gallery-chrome" style={st.modeToggle} onClick={() => setMode('stack')} role="button" tabIndex={0}>
           <StackIcon />
         </div>
-        <div style={st.shareToggle} onClick={shareGallery} role="button" tabIndex={0}>
+        <div className="gallery-chrome" style={st.shareToggle} onClick={shareGallery} role="button" tabIndex={0}>
           {copied ? <CheckIcon /> : <SendIcon />}
         </div>
         {gridViewing && (
@@ -887,10 +898,10 @@ export default function PhotoGallery({ coupleNames, sneakPeekLabel, photos: rawP
       </div>
 
       {/* Mode toggle */}
-      <div style={st.modeToggle} onClick={() => setMode('grid')} role="button" tabIndex={0}>
+      <div className="gallery-chrome" style={st.modeToggle} onClick={() => setMode('grid')} role="button" tabIndex={0}>
         <GridIcon />
       </div>
-      <div style={st.shareToggle} onClick={shareGallery} role="button" tabIndex={0}>
+      <div className="gallery-chrome" style={st.shareToggle} onClick={shareGallery} role="button" tabIndex={0}>
         {copied ? <CheckIcon /> : <SendIcon />}
       </div>
 
